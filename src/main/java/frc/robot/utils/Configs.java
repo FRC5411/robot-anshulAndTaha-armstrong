@@ -11,12 +11,17 @@ public class Configs {
 
     public static CANSparkMax NEO(int deviceID, boolean inverted) {
         CANSparkMax motor = new CANSparkMax(deviceID, MotorType.kBrushless);
-        motor.restoreFactoryDefaults();
         motor.clearFaults();
         motor.setSmartCurrentLimit(40);
         motor.setSecondaryCurrentLimit(40);
         motor.setIdleMode(IdleMode.kBrake);
         motor.setInverted(inverted);
+        return motor;
+    }
+
+    public static CANSparkMax NEO(int deviceID, boolean inverted, CANSparkMax leader) {
+        CANSparkMax motor = NEO(deviceID, inverted);
+        motor.follow(leader);
         return motor;
     }
 
@@ -27,12 +32,11 @@ public class Configs {
         return encoder;
     }
 
-    public static RelativeEncoder BoreEncoder(int channelA, int channelB, boolean isInverted) {
+    public static Encoder BoreEncoder(int channelA, int channelB, double CF, boolean isInverted) {
         Encoder encoder = new Encoder(channelA, channelB);
         encoder.setReverseDirection(isInverted);
         encoder.setDistancePerPulse(channelB);
-        encoder.setPositionConversionFactor(CF);
-        encoder.setVelocityConversionFactor(CF / 60);
+        encoder.setDistancePerPulse(CF);
         return encoder;
     }
 
