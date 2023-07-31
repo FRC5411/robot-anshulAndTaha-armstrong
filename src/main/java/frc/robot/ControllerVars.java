@@ -19,5 +19,8 @@ public class ControllerVars {
         public static final Trigger b = xboxController.b();
         public static final Trigger x = xboxController.x();
         public static final Trigger y = xboxController.y();
+
+        public static final Trigger leftTrigger = xboxController.leftTrigger();
+        public static final Trigger rightTrigger = xboxController.rightTrigger();
     }
 }

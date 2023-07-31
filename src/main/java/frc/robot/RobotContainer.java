@@ -22,7 +22,7 @@ public class RobotContainer {
     robotIntake = new IntakeSubsystem();
 
     robotDrive.setDefaultCommand(
-      robotDrive.arcadeCommand(
+      robotDrive.arcadeCmd(
         () -> Objects.xboxController.getLeftY(), 
         () -> Objects.xboxController.getRightX(), 
         () -> RobotStates.sDriveSniperMode));
@@ -30,7 +30,15 @@ public class RobotContainer {
     configureBindings();
   }
 
-  private void configureBindings() {}
+  private void configureBindings() {
+    // Drive Bindings
+    Objects.a.onTrue(robotDrive.autoEngageCmd());
+    Objects.b.onTrue(robotDrive.turnCommand(180));
+    Objects.y.onTrue(robotDrive.resetOdometryCmd());
+
+    Objects.leftTrigger.whileTrue(robotDrive.sniperTrueCmd());
+    Objects.rightTrigger.whileTrue(robotDrive.sniperFalseCmd());
+  }
 
   public Command getAutonomousCommand() {
     return Commands.print("No autonomous command configured");

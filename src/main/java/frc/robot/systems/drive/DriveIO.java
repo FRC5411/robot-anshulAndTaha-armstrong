@@ -121,6 +121,10 @@ public class DriveIO {
         return Rotation2d.fromDegrees(Objects.navX.getYaw());
     }
 
+    public double getPitch() {
+        return Objects.navX.getPitch();
+    }
+
     public void resetGyro() {
         Objects.navX.setAngleAdjustment(getHeading().getDegrees());;
     }
