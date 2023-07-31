@@ -4,11 +4,10 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.function.DoubleSupplier;
-
+import java.util.HashMap;
 import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -16,7 +15,6 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 public class DriveSubsystem extends SubsystemBase {
   DriveIO IO;
   DriveIOSim simIO;
-  
 
   public DriveSubsystem() {
     IO = new DriveIO();
@@ -24,7 +22,9 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public Command getAutonomousCommand() {
-    return Commands.print("No autonomous command configured");
+    HashMap<String, Command> map = new HashMap<>();
+
+    return IO.followPathwithEvents("New", true, map, this);
   }
 
   @Override
@@ -101,12 +101,12 @@ public class DriveSubsystem extends SubsystemBase {
       double kf = 0.05;
 
     return new FunctionalCommand(
-      () -> { controller.reset(IO.getHeading().getDegrees());}, 
+      () -> { controller.reset(simIO.getHeading().getDegrees());}, 
       () -> {IO.arcadeDrive(
-        controller.calculate(IO.getHeading().getDegrees(), setpoint) 
-        + kf * Math.signum(controller.getPositionError()), 0.0);}, 
+        0.0, controller.calculate(simIO.getHeading().getDegrees() % 360, setpoint) 
+        + kf * Math.signum(controller.getPositionError()));}, 
       interrupted -> {}, 
-      () -> false, 
+      () -> controller.atGoal(), 
       this);
   }
 }

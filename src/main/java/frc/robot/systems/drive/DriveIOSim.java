@@ -1,7 +1,10 @@
 package frc.robot.systems.drive;
 
 import java.util.HashMap;
+import java.util.List;
 
+import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.auto.PIDConstants;
 import com.pathplanner.lib.auto.RamseteAutoBuilder;
@@ -44,7 +47,12 @@ public class DriveIOSim {
     }
 
     /////// PATH PLANNER \\\\\\\
-    public Command followPathwithEvents(PathPlannerTrajectory traj, boolean useColor, HashMap<String, Command> eventMap, Subsystem drive) {
+    public Command followPathwithEvents(String trajPath, boolean useColor, HashMap<String, Command> eventMap, Subsystem drive) {
+        PathConstraints pathConstraints = PathPlanner.getConstraintsFromPath(trajPath);
+        List<PathPlannerTrajectory> mainTrajectory = PathPlanner.loadPathGroup(trajPath, pathConstraints);
+        PathPlannerTrajectory mapTrajectory = PathPlanner.loadPath(trajPath, pathConstraints);
+        Simulation.field.getObject(trajPath).setTrajectory(mapTrajectory);
+
         RamseteAutoBuilder builder = new RamseteAutoBuilder(
             this::getPose, 
             this::resetPose, 
@@ -58,7 +66,7 @@ public class DriveIOSim {
             useColor, 
             drive);
 
-        return builder.fullAuto(traj);
+        return builder.fullAuto(mainTrajectory);
     }
 
     public Pose2d getPose() {
@@ -78,7 +86,8 @@ public class DriveIOSim {
     }
 
     public void update() {
-        Simulation.driveSim.setInputs(Objects.leftFront.get() * 12, Objects.leftFront.get() * 12);
+        Simulation.lasttime += 0.02;
+        Simulation.driveSim.setInputs(Objects.leftFront.get() * 12, Objects.rightFront.get() * 12);
         Simulation.driveSim.update(0.02);
     }
 
@@ -120,6 +129,17 @@ public class DriveIOSim {
         SmartDashboard.putNumber("SimDrive/Chassis/XMPS", getChassisSpeeds().vxMetersPerSecond);
         SmartDashboard.putNumber("SimDrive/Chassis/YMPS", getChassisSpeeds().vyMetersPerSecond);
         SmartDashboard.putNumber("SimDrive/Chassis/DegreesMPS", Math.toRadians(getChassisSpeeds().omegaRadiansPerSecond));
+
+        SmartDashboard.putNumber("SimDrive/Chassis/LeftVelocity", getLeftVelocity());
+        SmartDashboard.putNumber("SimDrive/Chassis/RightVelocity", getRightVelocity());
+
+        SmartDashboard.putNumber("SimDrive/Chassis/LeftPosition", getLeftPosition());
+        SmartDashboard.putNumber("SimDrive/Chassis/RightPosition", getRightPosition());
+
+        SmartDashboard.putNumber("SimDrive/Chassis/LeftVolts", Objects.leftFront.get() * 12);
+        SmartDashboard.putNumber("SimDrive/Chassis/RightVolts", Objects.rightFront.get() * 12);
+
+        SmartDashboard.putNumber("SimDrive/Chassis/LastTime", Simulation.lasttime);
     }
 
     public void setField() {
