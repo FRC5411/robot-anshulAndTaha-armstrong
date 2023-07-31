@@ -15,12 +15,14 @@ public class ArmIO {
         return Conversions.boreEncTicksToDeg(Objects.armBoreEncoder.getDistance(), Constants.kArmGearRatio);
     }
 
+    // WARNING: Limits for arm will not work if setArm isn't being updated periodically
     public void setArm(double speed){
-        Objects.armMotor.set(speed);
+        if(safeToMoveArm(speed)) Objects.armMotor.set(speed);
     }
 
-    public static void setArmReduc(double speed){
-        Objects.armMotor.set(speed * (Constants.kSpeedPercentage * 0.01));
+    // WARNING: Limits for arm will not work if setArm isn't being updated periodically
+    public void setArmReduc(double speed){
+        if(safeToMoveArm(speed)) Objects.armMotor.set(speed * (Constants.kSpeedPercentage * 0.01));
     }
 
     public static double getXAxisArmAngle() {
@@ -30,4 +32,17 @@ public class ArmIO {
         
         return Math.toRadians(ffAngleDegs);
     }
+
+    public boolean safeToMoveArm(double desiredSpeed) {
+        double armPosition = getArmAngle();
+
+        if ((armPosition > 263 && desiredSpeed > 0) || 
+            (armPosition < 3 && desiredSpeed < 0)) {
+            setArm(0);
+            return false;
+        };
+
+        return true;
+      }
+
 }

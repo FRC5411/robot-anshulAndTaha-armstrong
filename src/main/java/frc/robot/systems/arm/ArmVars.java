@@ -18,7 +18,7 @@ public class ArmVars {
         public static final double kArmVelocity = 250;
 
         public static final double kArmGearRatio = 22.755;
-        public static final double kSpeedPercentage = 60;
+        public static final double kSpeedPercentage = 80;
         
         public static final double kIdleAngle = 0;
         public static final double kFlatAngle = 0;

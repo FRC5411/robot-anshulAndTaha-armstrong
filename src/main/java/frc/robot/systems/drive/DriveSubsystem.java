@@ -85,7 +85,10 @@ public class DriveSubsystem extends SubsystemBase {
       () -> {
         IO.arcadeDrive(
           engageController.calculate(
-            IO.getPitch(), 0) + kf * Math.signum(engageController.getPositionError()), 0);}, 
+            IO.getPitch(), 0) + 
+            kf * Math.signum(engageController.getPositionError()), // accounts for static friction
+            0);
+      }, 
       interrupted -> {}, 
       () -> false, 
       this);

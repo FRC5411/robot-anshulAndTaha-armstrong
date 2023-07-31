@@ -21,28 +21,14 @@ public class ArmSubsystem extends SubsystemBase {
 
   //////////////////////////////////////////////////////////////////////////////////////////////////
 
-  public FunctionalCommand armHold(ArmSubsystem robotArm) {
-    double kg = 0.03;
-
-    ArmFeedforward feedForward = new ArmFeedforward(0, kg, 0, 0);
-    
-    return new FunctionalCommand(
-      () -> System.out.println("Command HOLD ARM COMMAND has started"), 
-      () -> {
-        // 
-        if(RobotStates.sShouldHoldArm){
-          double calc = feedForward.calculate(ArmIO.getXAxisArmAngle(), 0);
-    
-          armIO.setArm(calc);
-        }}, 
-      interrupted -> {},
-      () -> false, 
-      robotArm);
+  public void setArmTeleop(double speed){
+    armIO.setArmReduc(speed);
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////
 
-  public FunctionalCommand armTeleop(ArmSubsystem robotArm, String strSetpoint){
+  // NOTE: This function uses isACone as a paramater and not a global variable because we don't want it to affect buttonboard
+  public FunctionalCommand armPIDAuton(ArmSubsystem robotArm, String strSetpoint, boolean isACone){
     double kP = 0.066;
     double kI = 0;
     double kD = 0;
@@ -55,11 +41,11 @@ public class ArmSubsystem extends SubsystemBase {
         pid.setTolerance(2);
         pid.reset(ArmIO.getArmAngle());
 
-        System.out.println("Command Teleop ARM ALIGN has started");
+        System.out.println("Command AUTON ARM ALIGN has started");
       }, () -> {
 
       // Execute Code
-        double calc = pid.calculate(ArmIO.getArmAngle(), returnAngle(strSetpoint));
+        double calc = pid.calculate(ArmIO.getArmAngle(), returnAngle(strSetpoint, isACone));
         armIO.setArm(calc);
       }, 
 
@@ -72,22 +58,73 @@ public class ArmSubsystem extends SubsystemBase {
 
   //////////////////////////////////////////////////////////////////////////////////////////////////
 
-  private double returnAngle(String pos){
+  public FunctionalCommand armFFHold(ArmSubsystem robotArm) {
+    double kg = 0.03;
+
+    ArmFeedforward feedForward = new ArmFeedforward(0, kg, 0, 0);
+    
+    return new FunctionalCommand(
+      () -> System.out.println("Command HOLD ARM COMMAND has started"), 
+      () -> {
+        if(RobotStates.sShouldHoldArm){
+          double calc = feedForward.calculate(ArmIO.getXAxisArmAngle(), 0);
+    
+          armIO.setArm(calc);
+        }}, 
+      interrupted -> {},
+      () -> false, 
+      robotArm);
+  }
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public FunctionalCommand armPIDTeleop(ArmSubsystem robotArm, String strSetpoint){
+    double kP = 0.066;
+    double kI = 0;
+    double kD = 0;
+
+    ProfiledPIDController pid = new ProfiledPIDController(kP, kI, kD, new TrapezoidProfile.Constraints(Constants.kArmVelocity, Constants.kArmAcceleration));
+    
+    return new FunctionalCommand(() -> {
+
+      // Initialize Code
+        pid.setTolerance(2);
+        pid.reset(ArmIO.getArmAngle());
+
+        System.out.println("Command TELEOP ARM ALIGN has started");
+      }, () -> {
+
+      // Execute Code
+        double calc = pid.calculate(ArmIO.getArmAngle(), returnAngle(strSetpoint, RobotStates.sIsConeMode));
+        
+        armIO.setArm(calc);
+      }, 
+
+      interrupted -> {}, 
+
+      () -> false, 
+      
+      robotArm);
+  }
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+
+  private double returnAngle(String pos, boolean coneState){
     switch(pos){
       case "high":
-        return (RobotStates.sIsConeMode) ? Constants.ConeAngles.kHigh : Constants.CubeAngles.kHigh;
+        return (coneState) ? Constants.ConeAngles.kHigh : Constants.CubeAngles.kHigh;
 
       case "mid":
-        return (RobotStates.sIsConeMode) ? Constants.ConeAngles.kMid : Constants.CubeAngles.kMid;
+        return (coneState) ? Constants.ConeAngles.kMid : Constants.CubeAngles.kMid;
         
       case "low":
-        return (RobotStates.sIsConeMode) ? Constants.ConeAngles.kLow : Constants.CubeAngles.kLow;
+        return (coneState) ? Constants.ConeAngles.kLow : Constants.CubeAngles.kLow;
         
       case "ground":
-        return (RobotStates.sIsConeMode) ? Constants.ConeAngles.kGround : Constants.CubeAngles.kGround;
+        return (coneState) ? Constants.ConeAngles.kGround : Constants.CubeAngles.kGround;
         
       case "substation":
-        return (RobotStates.sIsConeMode) ? Constants.ConeAngles.kSubstation : Constants.CubeAngles.kSubstation;
+        return (coneState) ? Constants.ConeAngles.kSubstation : Constants.CubeAngles.kSubstation;
 
       case "idle":
         return Constants.kIdleAngle;

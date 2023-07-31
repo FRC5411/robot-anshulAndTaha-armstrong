@@ -22,5 +22,7 @@ public class ControllerVars {
 
         public static final Trigger leftTrigger = xboxController.leftTrigger();
         public static final Trigger rightTrigger = xboxController.rightTrigger();
-    }
+
+        // public static final buttonBoard = new CommandGenericHID(ButtonBoardConstants.BUTTON_BOARD_PORT);
+}
 }

@@ -38,6 +38,9 @@ public class RobotContainer {
 
     Objects.leftTrigger.whileTrue(robotDrive.sniperTrueCmd());
     Objects.rightTrigger.whileTrue(robotDrive.sniperFalseCmd());
+
+    // Arm Bindings
+    
   }
 
   public Command getAutonomousCommand() {

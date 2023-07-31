@@ -39,13 +39,9 @@ public class DriveIO {
     }
 
     public void teleopDrive(double speed, double rotation, boolean snipermode) {
-        if (Math.abs(speed) < Constants.kDeadzone) {
-            speed = 0;
-        }
-
-        if (Math.abs(rotation) < Constants.kDeadzone) {
-            rotation = 0;
-        }
+        if (Math.abs(speed) < Constants.kDeadzone) speed = 0;
+        if (Math.abs(rotation) < Constants.kDeadzone) rotation = 0;
+        
 
         rotation *= Constants.kRotationScaler;
 
