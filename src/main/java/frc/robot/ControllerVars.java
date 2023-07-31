@@ -16,8 +16,8 @@ public class ControllerVars {
         public static final CommandXboxController xboxController = new CommandXboxController(0);
 
         public static final Trigger a = xboxController.a();
-        Trigger b = xboxController.b();
-        Trigger x = xboxController.x();
-        Trigger y = xboxController.y();
+        public static final Trigger b = xboxController.b();
+        public static final Trigger x = xboxController.x();
+        public static final Trigger y = xboxController.y();
     }
 }
