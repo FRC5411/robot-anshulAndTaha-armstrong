@@ -13,7 +13,31 @@ public class ArmVars {
     public final static class Constants {
         public static final int kArmID = 1; 
         public static final int[] kArmEncoderIDs = {0, 1};
+        
+        public static final double kArmAcceleration = 100;
+        public static final double kArmVelocity = 250;
 
+        public static final double kArmGearRatio = 22.755;
+        public static final double kSpeedPercentage = 60;
+        
+        public static final double kIdleAngle = 0;
+        public static final double kFlatAngle = 0;
+
+        public final static class CubeAngles{
+            public static final double kHigh = 0;
+            public static final double kMid = 0;
+            public static final double kLow = 0;
+            public static final double kGround = 0;
+            public static final double kSubstation = 0;
+        }
+
+        public final static class ConeAngles {
+            public static final double kHigh = 0;
+            public static final double kMid = 0;
+            public static final double kLow = 0;
+            public static final double kGround = 0;
+            public static final double kSubstation = 0;
+        }
     }
 
     public final static class Objects {

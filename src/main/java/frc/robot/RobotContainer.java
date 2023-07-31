@@ -6,9 +6,27 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.systems.arm.ArmSubsystem;
+import frc.robot.systems.drive.DriveSubsystem;
+import frc.robot.systems.intake.IntakeSubsystem;
+import frc.robot.ControllerVars.Objects;
 
 public class RobotContainer {
+  private DriveSubsystem robotDrive; 
+  private ArmSubsystem robotArm; 
+  private IntakeSubsystem robotIntake; 
+
   public RobotContainer() {
+    robotDrive = new DriveSubsystem();
+    robotArm = new ArmSubsystem();
+    robotIntake = new IntakeSubsystem();
+
+    robotDrive.setDefaultCommand(
+      robotDrive.arcadeCommand(
+        () -> Objects.xboxController.getLeftY(), 
+        () -> Objects.xboxController.getRightX(), 
+        () -> RobotStates.sDriveSniperMode));
+
     configureBindings();
   }
 

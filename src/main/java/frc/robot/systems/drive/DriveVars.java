@@ -1,9 +1,12 @@
 package frc.robot.systems.drive;
 
 import frc.robot.utils.Configs;
+
 import com.kauailabs.navx.frc.AHRS;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
+
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.controller.RamseteController;
@@ -15,6 +18,9 @@ import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 
 public class DriveVars {
     public final static class Constants {
@@ -29,6 +35,11 @@ public class DriveVars {
 
         public static final double kWheelRadiusMeters = 0.0762;
         public static final double kGearRatio = 7.89;
+
+        public static final double massKg = Units.lbsToKilograms(125);
+
+        // Arbitrary
+        public static final double MOIKGMeterSquared = 500;
 
         // Odometry
         public static final double ConversionFactor = (2 * Math.PI * kWheelRadiusMeters) / kGearRatio;
@@ -57,6 +68,8 @@ public class DriveVars {
 
         // Vision
         public static final Vector<N3> kVisionMeasurementStdDevs = VecBuilder.fill(0.1, 0.1, Math.toRadians(200));
+
+        public static final double kSniperScaler = 0.4;
     }
 
     public final static class Objects {
@@ -81,5 +94,20 @@ public class DriveVars {
 
         public static final DifferentialDrivePoseEstimator poseEstimator = new DifferentialDrivePoseEstimator(
             Constants.kTankKinematics, new Rotation2d(), 0, 0, new Pose2d());
+
+        public static final Field2d field = new Field2d();
+    }
+
+    public final static class Simulation {
+        public static final Field2d field = new Field2d();
+
+        public static final DifferentialDrivetrainSim driveSim = new DifferentialDrivetrainSim(
+            DCMotor.getNEO(2),
+            Constants.kGearRatio,
+            Constants.MOIKGMeterSquared,
+            Constants.massKg,
+            Constants.kWheelRadiusMeters,
+            Constants.kTrackWidthMeters,
+            VecBuilder.fill(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
     }
 }

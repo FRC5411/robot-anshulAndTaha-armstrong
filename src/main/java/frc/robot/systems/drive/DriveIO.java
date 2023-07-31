@@ -1,7 +1,3 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.systems.drive;
 
 import java.util.HashMap;
@@ -16,8 +12,20 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+
 import frc.robot.systems.drive.DriveVars.Constants;
 import frc.robot.systems.drive.DriveVars.Objects;
+
+import com.revrobotics.CANSparkMax;
+
+import java.util.List;
+
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathConstraints;
+
+import frc.robot.RobotStates;
 
 /** Add your docs here. */
 public class DriveIO {
@@ -28,9 +36,7 @@ public class DriveIO {
         Objects.robotDrive.arcadeDrive(speed, rotation);
     }
 
-    public void teleopDrive(double speed, double rotation) {
-        rotation *= Constants.kRotationScaler;
-
+    public void teleopDrive(double speed, double rotation, boolean snipermode) {
         if (Math.abs(speed) < Constants.kDeadzone) {
             speed = 0;
         }
@@ -39,14 +45,26 @@ public class DriveIO {
             rotation = 0;
         }
 
+        rotation *= Constants.kRotationScaler;
+
+        if (snipermode) {
+            speed *= Constants.kSniperScaler;
+            rotation *= Constants.kSniperScaler;
+        }
+
         Objects.robotDrive.arcadeDrive(speed, rotation);
     }
 
     /////// PATH PLANNER \\\\\\\
-    public Command followPathwithEvents(PathPlannerTrajectory traj, boolean useColor, HashMap<String, Command> eventMap, Subsystem drive) {
+    public Command followPathwithEvents(String trajPath, boolean useColor, HashMap<String, Command> eventMap, Subsystem drive) {
+        PathConstraints pathConstraints = PathPlanner.getConstraintsFromPath(trajPath);
+        List<PathPlannerTrajectory> mainTrajectory = PathPlanner.loadPathGroup(trajPath, pathConstraints);
+        PathPlannerTrajectory mapTrajectory = PathPlanner.loadPath(trajPath, pathConstraints);
+        Objects.field.getObject(trajPath).setTrajectory(mapTrajectory);
+
         RamseteAutoBuilder builder = new RamseteAutoBuilder(
             this::getPose, 
-            this::resetPose, 
+            this::resetPose,
             Objects.ramseteController, 
             Constants.kTankKinematics, 
             Objects.feedforward, 
@@ -57,7 +75,7 @@ public class DriveIO {
             useColor, 
             drive);
 
-        return builder.fullAuto(traj);
+        return builder.fullAuto(mainTrajectory);
     }
 
     public Pose2d getPose() {
@@ -75,6 +93,10 @@ public class DriveIO {
 
     public DifferentialDriveWheelSpeeds getWheelSpeeds() {
         return new DifferentialDriveWheelSpeeds(getLeftFrontVelocity(), getRightFrontVelocity());
+    }
+
+    public ChassisSpeeds getChassisSpeeds() {
+        return Constants.kTankKinematics.toChassisSpeeds(getWheelSpeeds());
     }
 
     public void setTankDriveVolts(double rightVolts, double leftVolts) {
@@ -142,5 +164,62 @@ public class DriveIO {
 
     public double getPosition(RelativeEncoder encoder, boolean inverted) {
         return inverted ? -encoder.getPosition() : encoder.getPosition();
+    }
+
+    // Telemetry
+    public void telemetry() {
+        telemetryLF();
+        telemetryLB();
+        telemetryRF();
+        telemetryRB();
+
+        SmartDashboard.putNumber("Drive/Chassis/X", getPose().getX());
+        SmartDashboard.putNumber("Drive/Chassis/Y", getPose().getY());
+        SmartDashboard.putNumber("Drive/Chassis/Degrees", getPose().getRotation().getDegrees());
+
+        SmartDashboard.putNumber("Drive/Speed/XMPS", getChassisSpeeds().vxMetersPerSecond);
+        SmartDashboard.putNumber("Drive/Speed/YMPS", getChassisSpeeds().vyMetersPerSecond);
+        SmartDashboard.putNumber("Drive/Speed/DegreesMPS", Math.toRadians(getChassisSpeeds().omegaRadiansPerSecond));
+
+        SmartDashboard.putBoolean("Drive/SniperMode", RobotStates.sDriveSniperMode);
+    }
+
+    public void telemetryLF() {
+        telemetryMotor("Drive/LF/", Objects.leftFront, Objects.leftFrontEncoder);
+    }
+
+    public void telemetryLB() {
+        telemetryMotor("Drive/LB/", Objects.leftBack, Objects.leftBackEncoder);
+    }
+
+    public void telemetryRF() {
+        telemetryMotor("Drive/RF/", Objects.rightFront, Objects.rightBackEncoder);
+    }
+
+    public void telemetryRB() {
+        telemetryMotor("Drive/RB/", Objects.rightBack, Objects.rightBackEncoder);
+    }
+
+    public void telemetryMotor(String key, CANSparkMax motor, RelativeEncoder encoder) {
+        SmartDashboard.putNumber(key + "Position", encoder.getPosition());
+        SmartDashboard.putNumber(key + "Velocity", encoder.getVelocity());
+        SmartDashboard.putNumber(key + "Voltage", motor.get() * 12);
+        SmartDashboard.putNumber(key + "BusVoltage", motor.getBusVoltage());
+        SmartDashboard.putNumber(key + "Temperature", motor.getMotorTemperature());
+        SmartDashboard.putNumber(key + "DutyCycle", motor.getAppliedOutput());
+        SmartDashboard.putNumber(key + "Amps", motor.getOutputCurrent());
+        SmartDashboard.putNumber(key + "ID", motor.getDeviceId());
+    }
+
+    public void setField() {
+        Objects.field.setRobotPose(getPose());
+    }
+
+    public void trueSniperMode() {
+        RobotStates.sDriveSniperMode = true;
+    }
+
+    public void falseSniperMode() {
+        RobotStates.sDriveSniperMode = false;
     }
 }
