@@ -15,11 +15,15 @@ import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
+import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 
 public class DriveVars {
@@ -30,35 +34,35 @@ public class DriveVars {
         public static final int kRightFrontID = 13;
         public static final int kRightBackID = 14;
 
-        public static final boolean kLeftInvert = true;
+        public static final boolean kLeftInvert = false;
         public static final boolean kRightInvert = false;
 
         public static final double kWheelRadiusMeters = 0.0762;
         public static final double kGearRatio = 7.89;
 
-        public static final double massKg = Units.lbsToKilograms(125);
+        public static final double kMassKg = 125;
 
         // Arbitrary
-        public static final double MOIKGMeterSquared = 10;
+        public static final double kMOIKGMeterSquared = 10;
 
         // Odometry
-        public static final double ConversionFactor = (2 * Math.PI * kWheelRadiusMeters) / kGearRatio;
-        public static final double SF = (2.16/0.548);
-        public static final double ScaledCF = ConversionFactor * SF;
+        public static final double kConversionFactor = (2 * Math.PI * kWheelRadiusMeters) / kGearRatio;
+        public static final double kSF = (2.16/0.548);
+        public static final double kScaledCF = kConversionFactor * kSF;
 
         // Path Planner
         public static final double kTrackWidthMeters = Units.inchesToMeters(21);
 
-        public static final double RAMSETE_B = 2;
-        public static final double RAMSETE_ZETA = 0.7; 
+        public static final double kRamseteB = 2;
+        public static final double kRamseteZeta = 0.7; 
         public static final DifferentialDriveKinematics kTankKinematics = 
                             new DifferentialDriveKinematics(kTrackWidthMeters);
 
-        public static final double VOLTS = 0.14592; //kS
-        public static final double VOLT_SECONDS_PER_METER = 2.0809; //kV
-        public static final double VOLT_SECONDS_SQUARED_PER_METER = 0.83925; //kA
+        public static final double kVolts = 0.14592; //kS
+        public static final double kVoltsMPS = 2.0809; //kV
+        public static final double kVoltsMSPS = 0.83925; //kA
 
-        public static final double kPDrive = 0.009;
+        public static final double kPDrive = 1.4;
         public static final double kIDrive = 0;
         public static final double kDDrive = 0;
 
@@ -78,15 +82,15 @@ public class DriveVars {
         public static final CANSparkMax rightFront = Configs.NEO(Constants.kRightFrontID, Constants.kRightInvert);
         public static final CANSparkMax rightBack = Configs.NEO(Constants.kRightBackID, Constants.kRightInvert, rightFront);
 
-        public static final RelativeEncoder leftFrontEncoder = Configs.RelativeEncoder(leftFront, Constants.ScaledCF);
-        public static final RelativeEncoder leftBackEncoder = Configs.RelativeEncoder(leftBack, Constants.ScaledCF);
-        public static final RelativeEncoder rightFrontEncoder = Configs.RelativeEncoder(rightFront, Constants.ScaledCF);
-        public static final RelativeEncoder rightBackEncoder = Configs.RelativeEncoder(rightBack, Constants.ScaledCF);
+        public static final RelativeEncoder leftFrontEncoder = Configs.RelativeEncoder(leftFront, Constants.kScaledCF);
+        public static final RelativeEncoder leftBackEncoder = Configs.RelativeEncoder(leftBack, Constants.kScaledCF);
+        public static final RelativeEncoder rightFrontEncoder = Configs.RelativeEncoder(rightFront, Constants.kScaledCF);
+        public static final RelativeEncoder rightBackEncoder = Configs.RelativeEncoder(rightBack, Constants.kScaledCF);
 
-        public static final RamseteController ramseteController = new RamseteController(Constants.RAMSETE_B, Constants.RAMSETE_ZETA);
+        public static final RamseteController ramseteController = new RamseteController(Constants.kRamseteB, Constants.kRamseteZeta);
 
         public static final SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(
-            Constants.VOLTS, Constants.VOLT_SECONDS_PER_METER, Constants.VOLT_SECONDS_SQUARED_PER_METER);
+            Constants.kVolts, Constants.kVoltsMPS, Constants.kVoltsMSPS);
 
         public static final DifferentialDrive robotDrive = new DifferentialDrive(leftFront, rightFront);
 
@@ -99,13 +103,21 @@ public class DriveVars {
     }
 
     public final static class Simulation {
+        public static double lasttime = 0;
+
         public static final Field2d field = new Field2d();
+
+        PWMSparkMax m_leftFront = new PWMSparkMax(Constants.kLeftFrontID);
+        PWMSparkMax m_leftBack = new PWMSparkMax(Constants.kLeftBackID);
+        
+        public static final LinearSystem<N2, N2, N2> m_drivetrainSystem =
+        LinearSystemId.identifyDrivetrainSystem(1.98, 0.2, 1.5, 0.3);
 
         public static final DifferentialDrivetrainSim driveSim = new DifferentialDrivetrainSim(
             DCMotor.getNEO(2),
             Constants.kGearRatio,
-            Constants.MOIKGMeterSquared,
-            Constants.massKg,
+            Constants.kMassKg,
+            Constants.kMOIKGMeterSquared,
             Constants.kWheelRadiusMeters,
             Constants.kTrackWidthMeters,
             VecBuilder.fill(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));

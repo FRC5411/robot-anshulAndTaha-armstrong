@@ -15,11 +15,19 @@
   "NetworkTables": {
     "transitory": {
       "SmartDashboard": {
-        "SimDrive": {
+        "Drive": {
           "Chassis": {
             "open": true
           },
           "open": true
+        },
+        "PPRamseteCommand": {
+          "open": true
+        },
+        "SimDrive": {
+          "Chassis": {
+            "open": true
+          }
         },
         "open": true
       }
