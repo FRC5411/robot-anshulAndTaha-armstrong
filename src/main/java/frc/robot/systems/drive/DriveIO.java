@@ -29,7 +29,9 @@ import frc.robot.RobotStates;
 
 /** Add your docs here. */
 public class DriveIO {
-    public DriveIO() {}
+    public DriveIO() {
+        SmartDashboard.putData(Objects.field);
+    }
 
     ////// TELEOP \\\\\\\
     public void arcadeDrive(double speed, double rotation) {

@@ -20,7 +20,9 @@ import frc.robot.systems.drive.DriveVars.Simulation;
 
 /** Add your docs here. */
 public class DriveIOSim {
-    public DriveIOSim() {}
+    public DriveIOSim() {
+        SmartDashboard.putData(Simulation.field);
+    }
 
     ////// TELEOP \\\\\\\
     public void arcadeDrive(double speed, double rotation) {
@@ -111,13 +113,13 @@ public class DriveIOSim {
 
     // Telemetry
     public void telemetry() {
-        SmartDashboard.putNumber("Drive/Chassis/X", getPose().getX());
-        SmartDashboard.putNumber("Drive/Chassis/Y", getPose().getY());
-        SmartDashboard.putNumber("Drive/Chassis/Degrees", getPose().getRotation().getDegrees());
+        SmartDashboard.putNumber("SimDrive/Chassis/X", getPose().getX());
+        SmartDashboard.putNumber("SimDrive/Chassis/Y", getPose().getY());
+        SmartDashboard.putNumber("SimDrive/Chassis/Degrees", getPose().getRotation().getDegrees());
 
-        SmartDashboard.putNumber("Drive/Chassis/XMPS", getChassisSpeeds().vxMetersPerSecond);
-        SmartDashboard.putNumber("Drive/Chassis/YMPS", getChassisSpeeds().vyMetersPerSecond);
-        SmartDashboard.putNumber("Drive/Chassis/DegreesMPS", Math.toRadians(getChassisSpeeds().omegaRadiansPerSecond));
+        SmartDashboard.putNumber("SimDrive/Chassis/XMPS", getChassisSpeeds().vxMetersPerSecond);
+        SmartDashboard.putNumber("SimDrive/Chassis/YMPS", getChassisSpeeds().vyMetersPerSecond);
+        SmartDashboard.putNumber("SimDrive/Chassis/DegreesMPS", Math.toRadians(getChassisSpeeds().omegaRadiansPerSecond));
     }
 
     public void setField() {

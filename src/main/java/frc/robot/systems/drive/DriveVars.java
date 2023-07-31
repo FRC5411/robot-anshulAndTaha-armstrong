@@ -39,7 +39,7 @@ public class DriveVars {
         public static final double massKg = Units.lbsToKilograms(125);
 
         // Arbitrary
-        public static final double MOIKGMeterSquared = 500;
+        public static final double MOIKGMeterSquared = 10;
 
         // Odometry
         public static final double ConversionFactor = (2 * Math.PI * kWheelRadiusMeters) / kGearRatio;
