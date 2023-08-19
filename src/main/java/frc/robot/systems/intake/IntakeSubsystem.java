@@ -25,13 +25,13 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   public void intakeIn() {
-    if (RobotStates.sIsConeMode) intakeIO.setIntake(Constants.kIntakeConeSpeed);
-    else intakeIO.setIntake(-Constants.kIntakeCubeSpeed);
+    if (RobotStates.sIsConeMode) intakeIO.setIntake(-Constants.kIntakeConeSpeed);
+    else intakeIO.setIntake(Constants.kIntakeCubeSpeed);
   }
 
   public void intakeOut() {
-    if (RobotStates.sIsConeMode) intakeIO.setIntake(-Constants.kIntakeConeSpeed);
-    else intakeIO.setIntake(Constants.kIntakeCubeSpeed);
+    if (RobotStates.sIsConeMode) intakeIO.setIntake(Constants.kIntakeConeSpeed);
+    else intakeIO.setIntake(-Constants.kIntakeCubeSpeed);
   }
 
   public void intakeOff() {
@@ -43,7 +43,7 @@ public class IntakeSubsystem extends SubsystemBase {
     double calc = filter.calculate(intakeIO.getIntakeCurrent());
 
     if (calc > Constants.kIntakeCurrentLimit) { safeToSpin = false; }
-    safeToSpin = true;
+    else safeToSpin = true;
 }
 
   @Override

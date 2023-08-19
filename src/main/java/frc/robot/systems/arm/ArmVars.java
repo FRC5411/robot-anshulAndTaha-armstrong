@@ -27,19 +27,19 @@ public class ArmVars {
          * NOTE: ANGLES ARE OFF - DO NOT RUN
          */
         public final static class CubeAngles{
-            public static final double kHigh = 160;
-            public static final double kMid = 142;
-            public static final double kLow = 112;
-            public static final double kGround = 263;
-            public static final double kSubstation = 178;
+            public static final double kHigh = 130;
+            public static final double kMid = 130;
+            public static final double kLow = 130;
+            public static final double kGround = 130;
+            public static final double kSubstation = 130;
         }
 
         public final static class ConeAngles {
-            public static final double kHigh = 172;
-            public static final double kMid = 193;
-            public static final double kLow = 112;
-            public static final double kGround = 257;
-            public static final double kSubstation = 174;
+            public static final double kHigh = 100;
+            public static final double kMid = 100;
+            public static final double kLow = 100;
+            public static final double kGround = 100;
+            public static final double kSubstation = 100;
         }
     }
 
