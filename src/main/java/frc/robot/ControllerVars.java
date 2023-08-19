@@ -24,6 +24,9 @@ public class ControllerVars {
         public static final Trigger leftTrigger = xboxController.leftTrigger();
         public static final Trigger rightTrigger = xboxController.rightTrigger();
 
+        public static final Trigger leftBumper = xboxController.leftBumper();
+        public static final Trigger rightBumper = xboxController.rightBumper();
+
         public static final CommandGenericHID buttonBoard = new CommandGenericHID(1);
 
         public static final Trigger armHigh = buttonBoard.button(1);

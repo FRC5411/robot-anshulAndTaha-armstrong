@@ -13,8 +13,8 @@ import java.util.function.BooleanSupplier;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 
 public class DriveSubsystem extends SubsystemBase {
-  DriveIO IO;
-  DriveIOSim simIO;
+  private DriveIO IO;
+  private DriveIOSim simIO;
 
   public DriveSubsystem() {
     IO = new DriveIO();

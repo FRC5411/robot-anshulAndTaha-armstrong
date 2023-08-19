@@ -14,7 +14,7 @@ import frc.robot.RobotStates;
 import frc.robot.systems.arm.ArmVars.Constants;
 
 public class ArmSubsystem extends SubsystemBase {
-  ArmIO armIO;
+  private ArmIO armIO;
 
   public ArmSubsystem() {
     armIO = new ArmIO();
@@ -145,6 +145,6 @@ public class ArmSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("ARM POITION", ArmIO.getArmAngle());
+    SmartDashboard.putNumber("ARM POITION : ", ArmIO.getArmAngle());
   }
 }
