@@ -45,8 +45,8 @@ public class DriveSubsystem extends SubsystemBase {
     return new FunctionalCommand(
       () -> {},
       () -> {IO.teleopDrive(
-        speedSupplier.getAsDouble(), 
-        rotationSupplier.getAsDouble(),
+        speedSupplier.getAsDouble(),
+        rotationSupplier.getAsDouble(), 
         sniperMode.getAsBoolean());},
       interrupted -> {},
       () -> false,

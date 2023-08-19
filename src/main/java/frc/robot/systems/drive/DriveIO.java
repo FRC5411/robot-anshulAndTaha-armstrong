@@ -50,7 +50,7 @@ public class DriveIO {
             rotation *= Constants.kSniperScaler;
         }
 
-        Objects.robotDrive.arcadeDrive(speed, rotation);
+        Objects.robotDrive.arcadeDrive(rotation, speed);
     }
 
     /////// PATH PLANNER \\\\\\\

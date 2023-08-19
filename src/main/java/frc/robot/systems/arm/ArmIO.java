@@ -17,7 +17,9 @@ public class ArmIO {
 
     // WARNING: Limits for arm will not work if setArm isn't being updated periodically
     public void setArm(double speed){
-        if(safeToMoveArm(speed)) Objects.armMotor.set(speed);
+        if(safeToMoveArm(speed)) { Objects.armMotor.set(speed); }
+
+        System.out.println("\nAI : safeToMoveArm " + safeToMoveArm(speed));
     }
 
     // WARNING: Limits for arm will not work if setArm isn't being updated periodically

@@ -7,6 +7,7 @@ package frc.robot.systems.arm;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotStates;
@@ -64,12 +65,16 @@ public class ArmSubsystem extends SubsystemBase {
     ArmFeedforward feedForward = new ArmFeedforward(0, kg, 0, 0);
     
     return new FunctionalCommand(
-      () -> System.out.println("Command HOLD ARM COMMAND has started"), 
+      // Init
+      () -> System.out.println("Command HOLD ARM COMMAND has started"),
+      // Exec
       () -> {
         if(RobotStates.sShouldHoldArm){
           double calc = feedForward.calculate(ArmIO.getXAxisArmAngle(), 0);
     
           armIO.setArm(calc);
+
+          System.out.println("\nAS : EXECUTING armFFHold" + "\nAS : ARM CALC " + calc + "\nAS : ARM ANGLE " + ArmIO.getArmAngle());
         }}, 
       interrupted -> {},
       () -> false, 
@@ -87,17 +92,19 @@ public class ArmSubsystem extends SubsystemBase {
     
     return new FunctionalCommand(() -> {
 
-      // Initialize Code
+      // Init
         pid.setTolerance(2);
         pid.reset(ArmIO.getArmAngle());
 
         System.out.println("Command TELEOP ARM ALIGN has started");
       }, () -> {
 
-      // Execute Code
+      // Exec
         double calc = pid.calculate(ArmIO.getArmAngle(), returnAngle(strSetpoint, RobotStates.sIsConeMode));
         
         armIO.setArm(calc);
+
+        System.out.println("\n\nAS : EXECUTING armPIDTeleop" + "\nAS : ARM CALC " + calc + "\nAS : ARM ANGLE " + ArmIO.getArmAngle() + "\nAS : RETURNED ANGLE " + returnAngle(strSetpoint, RobotStates.sIsConeMode));
       }, 
 
       interrupted -> {}, 
@@ -138,6 +145,6 @@ public class ArmSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+    SmartDashboard.putNumber("ARM POITION", ArmIO.getArmAngle());
   }
 }
