@@ -35,7 +35,7 @@ public class DriveIO {
 
     ////// TELEOP \\\\\\\
     public void arcadeDrive(double speed, double rotation) {
-        Objects.robotDrive.arcadeDrive(speed, rotation);
+        Objects.robotDrive.arcadeDrive(rotation, speed);
     }
 
     public void teleopDrive(double speed, double rotation, boolean snipermode) {

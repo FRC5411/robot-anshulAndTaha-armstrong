@@ -37,7 +37,7 @@ public class DriveVars {
         public static final boolean kLeftInvert = false;
         public static final boolean kRightInvert = false;
 
-        public static final double kWheelRadiusMeters = 0.0762;
+        public static final double kWheelRadiusMeters = Units.inchesToMeters(3);
         public static final double kGearRatio = 7.89;
 
         public static final double kMassKg = 125;
@@ -46,12 +46,13 @@ public class DriveVars {
         public static final double kMOIKGMeterSquared = 10;
 
         // Odometry
-        public static final double kConversionFactor = (2 * Math.PI * kWheelRadiusMeters) / kGearRatio;
+        // public static final double kConversionFactor = (2 * Math.PI * kWheelRadiusMeters) / kGearRatio;
+        public static final double kConversionFactor = Units.inchesToMeters(1 / (kGearRatio * 2 * Math.PI * kWheelRadiusMeters));
         public static final double kSF = (2.16/0.548);
         public static final double kScaledCF = kConversionFactor * kSF;
 
         // Path Planner
-        public static final double kTrackWidthMeters = Units.inchesToMeters(21);
+        public static final double kTrackWidthMeters = Units.inchesToMeters(21); // 21
 
         public static final double kRamseteB = 2;
         public static final double kRamseteZeta = 0.7; 
