@@ -29,8 +29,18 @@ public class IntakeSubsystem extends SubsystemBase {
     else intakeIO.setIntake(Constants.kIntakeCubeSpeed);
   }
 
+  public void intakeIn(boolean isCone) {
+    if (isCone) intakeIO.setIntake(-Constants.kIntakeConeSpeed);
+    else intakeIO.setIntake(Constants.kIntakeCubeSpeed);
+  }
+
   public void intakeOut() {
     if (RobotStates.sIsConeMode) intakeIO.setIntake(Constants.kIntakeConeSpeed);
+    else intakeIO.setIntake(-Constants.kIntakeCubeSpeed);
+  }
+
+  public void intakeOut(boolean isCone) {
+    if (isCone) intakeIO.setIntake(Constants.kIntakeConeSpeed);
     else intakeIO.setIntake(-Constants.kIntakeCubeSpeed);
   }
 

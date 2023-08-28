@@ -50,6 +50,7 @@ public class DriveIO {
         }
 
         Objects.robotDrive.arcadeDrive(rotation, speed, RobotStates.sShouldSquareInputs);
+        Objects.robotDrive.feed();
     }
 
     /////// PATH PLANNER \\\\\\\
