@@ -48,7 +48,7 @@ public class DriveVars {
         // Odometry
         // public static final double kConversionFactor = (2 * Math.PI * kWheelRadiusMeters) / kGearRatio;
         // public static final double kSF = (2.16/0.548);
-        public static final double kScaledCF = Units.inchesToMeters (1 / kGearRatio * 2 * Math.PI * 1 * Units.inchesToMeters(kWheelRadiusMeters)) * (2.16/0.548);
+        public static final double kScaledCF = Units.inchesToMeters (1 / kGearRatio * 2 * Math.PI * kWheelRadiusMeters) * (2.16/0.548);
 
         // Path Planner
         public static final double kTrackWidthMeters = Units.inchesToMeters(21);
