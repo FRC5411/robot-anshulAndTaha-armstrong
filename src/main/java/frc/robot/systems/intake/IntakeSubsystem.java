@@ -38,6 +38,7 @@ public class IntakeSubsystem extends SubsystemBase {
     intakeIO.setIntake(0.0);
   }
 
+  // TO-DO: This method still needs to be tested to ensure it works the same as on the old code
   public void safeSpinIntake() {
     LinearFilter filter = LinearFilter.movingAverage(25);
     double calc = filter.calculate(intakeIO.getIntakeCurrent());

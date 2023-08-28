@@ -23,9 +23,9 @@ public class ArmVars {
         public static final double kIdleAngle = 1;
         public static final double kFlatAngle = 0;
 
-        /*
-         * NOTE: ANGLES ARE OFF - DO NOT RUN
-         */
+        
+        // NOTE: ANGLES ARE OFF - DO NOT RUN
+         
         public final static class CubeAngles{
             public static final double kHigh = 160;
             public static final double kMid = 142;

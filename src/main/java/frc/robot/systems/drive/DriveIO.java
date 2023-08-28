@@ -42,7 +42,6 @@ public class DriveIO {
         if (Math.abs(speed) < Constants.kDeadzone) speed = 0;
         if (Math.abs(rotation) < Constants.kDeadzone) rotation = 0;
         
-
         rotation *= Constants.kRotationScaler;
 
         if (snipermode) {
