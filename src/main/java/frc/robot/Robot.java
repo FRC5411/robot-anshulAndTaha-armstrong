@@ -26,7 +26,7 @@ public class Robot extends TimedRobot {
     DriverStation.startDataLog(DataLogManager.getLog());
 
     // (alternatively) Record only DS control data
-    DriverStation.startDataLog(DataLogManager.getLog(), false);
+    DriverStation.startDataLog(DataLogManager.getLog(), true);
   }
 
   @Override

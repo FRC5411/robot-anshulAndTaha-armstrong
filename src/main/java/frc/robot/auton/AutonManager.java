@@ -18,11 +18,21 @@ public class AutonManager extends SubsystemBase {
   private ArmSubsystem robotArm;
   private IntakeSubsystem robotIntake;
 
+  private double outtakeTime;
+  private double inttakeTime;
+
   /** Creates a new AutonManager. */
   public AutonManager(DriveSubsystem robotDrive, ArmSubsystem robotArm, IntakeSubsystem robotIntake) {
     this.robotDrive = robotDrive;
     this.robotArm = robotArm;
     this.robotIntake = robotIntake;
+
+    configureTimeouts();
+  }
+
+  private void configureTimeouts() {
+    outtakeTime = 0.5;
+    inttakeTime = 0.5;
   }
 
   /*
@@ -32,7 +42,7 @@ public class AutonManager extends SubsystemBase {
     HashMap<String, Command> map = new HashMap<>();
 
     map.put("ScoreConeHigh", robotArm.armPIDAuton(robotArm, "high", true));
-    map.put("OuttakeCone", robotIntake.intakeCommand(false, true));
+    map.put("OuttakeCone", robotIntake.intakeCommand(false, true).withTimeout(outtakeTime));
 
     map.put("IdleArm", robotArm.armPIDAuton(robotArm, "idle", false));
 

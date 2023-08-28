@@ -62,7 +62,7 @@ public class DriveVars {
         public static final double kVoltsMPS = 2.0809; //kV
         public static final double kVoltsMSPS = 0.83925; //kA
 
-        public static final double kPDrive = 1.4;
+        public static final double kPDrive = 0.0012;
         public static final double kIDrive = 0;
         public static final double kDDrive = 0;
 
