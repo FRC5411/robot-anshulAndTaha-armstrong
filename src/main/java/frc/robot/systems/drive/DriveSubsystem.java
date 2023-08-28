@@ -21,18 +21,8 @@ public class DriveSubsystem extends SubsystemBase {
     simIO = new DriveIOSim();
   }
 
-  public DriveIO getDriveIO() {
-    return IO;
-  }
-
-  public DriveIOSim getDriveIOSim() {
-    return simIO;
-  }
-
-  public Command getAutonomousCommand() {
-    HashMap<String, Command> map = new HashMap<>();
-
-    return IO.followPathwithEvents("New", true, map, this);
+  public Command getAutonomousCommand(String trajectory, boolean useColor, HashMap<String, Command> map, DriveSubsystem robotDrive) {
+    return IO.followPathwithEvents(trajectory, useColor, map, robotDrive);
   }
 
   @Override

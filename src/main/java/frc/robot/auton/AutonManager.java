@@ -9,26 +9,19 @@ import java.util.HashMap;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.systems.arm.ArmSubsystem;
-import frc.robot.systems.drive.DriveIO;
 import frc.robot.systems.drive.DriveSubsystem;
 import frc.robot.systems.intake.IntakeSubsystem;
 
 public class AutonManager extends SubsystemBase {
 
   private DriveSubsystem robotDrive;
-  private DriveIO IO;
-
   private ArmSubsystem robotArm;
-
   private IntakeSubsystem robotIntake;
 
   /** Creates a new AutonManager. */
   public AutonManager(DriveSubsystem robotDrive, ArmSubsystem robotArm, IntakeSubsystem robotIntake) {
     this.robotDrive = robotDrive;
-    IO = robotDrive.getDriveIO();
-
     this.robotArm = robotArm;
-
     this.robotIntake = robotIntake;
   }
 
@@ -43,7 +36,7 @@ public class AutonManager extends SubsystemBase {
 
     map.put("IdleArm", robotArm.armPIDAuton(robotArm, "idle", false));
 
-    return IO.followPathwithEvents("ConeHighMobility", true, map, robotDrive);
+    return robotDrive.getAutonomousCommand("ConeHighMobility", true, map, robotDrive);
   }
 
   @Override
