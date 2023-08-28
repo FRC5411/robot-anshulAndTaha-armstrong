@@ -11,4 +11,7 @@ public class RobotStates {
     public static boolean sDriveSniperMode = false;
     public static boolean sArmSniperMode = false;
     public static double sDesiredSpeed = 0;
+
+    public static double sDeadzones = 0.0;
+    public static boolean sShouldSquareInputs = false;
 }

@@ -39,8 +39,8 @@ public class DriveIO {
     }
 
     public void teleopDrive(double speed, double rotation, boolean snipermode) {
-        if (Math.abs(speed) < Constants.kDeadzone) speed = 0;
-        if (Math.abs(rotation) < Constants.kDeadzone) rotation = 0;
+        if (Math.abs(speed) < RobotStates.sDeadzones) speed = 0;
+        if (Math.abs(rotation) < RobotStates.sDeadzones) rotation = 0;
         
         rotation *= Constants.kRotationScaler;
 
@@ -49,7 +49,7 @@ public class DriveIO {
             rotation *= Constants.kSniperScaler;
         }
 
-        Objects.robotDrive.arcadeDrive(rotation, speed);
+        Objects.robotDrive.arcadeDrive(rotation, speed, RobotStates.sShouldSquareInputs);
     }
 
     /////// PATH PLANNER \\\\\\\

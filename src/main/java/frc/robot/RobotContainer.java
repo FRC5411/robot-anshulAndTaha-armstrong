@@ -6,6 +6,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.systems.arm.ArmSubsystem;
@@ -16,12 +18,17 @@ import frc.robot.ControllerVars.Objects;
 public class RobotContainer {
   private DriveSubsystem robotDrive; 
   private ArmSubsystem robotArm; 
-  private IntakeSubsystem robotIntake; 
+  private IntakeSubsystem robotIntake;
+
+  private SendableChooser<Command> driverChooser;
 
   public RobotContainer() {
     robotDrive = new DriveSubsystem();
     robotArm = new ArmSubsystem();
     robotIntake = new IntakeSubsystem();
+
+    driverChooser = new SendableChooser<>();
+    Shuffleboard.getTab("Driver Profiles").add(driverChooser);
 
     robotDrive.setDefaultCommand(
       robotDrive.arcadeCmd(
@@ -30,6 +37,7 @@ public class RobotContainer {
         () -> RobotStates.sDriveSniperMode));
 
     configureBindings();
+    configureDriveProfiles();
   }
 
   private void configureBindings() {
@@ -94,6 +102,18 @@ public class RobotContainer {
     Objects.outtakeButton
       .whileTrue(new InstantCommand(robotIntake :: intakeOut))
       .whileFalse(new InstantCommand(robotIntake :: intakeOff));
+  }
+
+  private void configureDriveProfiles() {
+    driverChooser.addOption("Aaron", new InstantCommand(() -> {
+      RobotStates.sDeadzones = 0.1;
+      RobotStates.sShouldSquareInputs = true;
+    }));
+    
+    driverChooser.addOption("System Defaults", new InstantCommand(() -> {
+      RobotStates.sDeadzones = 0.0;
+      RobotStates.sShouldSquareInputs = false;
+    }));
   }
 
   private Command shouldHoldArm() {
