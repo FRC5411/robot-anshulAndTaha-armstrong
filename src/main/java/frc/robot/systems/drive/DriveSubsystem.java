@@ -21,6 +21,14 @@ public class DriveSubsystem extends SubsystemBase {
     simIO = new DriveIOSim();
   }
 
+  public DriveIO getDriveIO() {
+    return IO;
+  }
+
+  public DriveIOSim getDriveIOSim() {
+    return simIO;
+  }
+
   public Command getAutonomousCommand() {
     HashMap<String, Command> map = new HashMap<>();
 

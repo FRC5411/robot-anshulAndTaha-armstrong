@@ -5,6 +5,7 @@
 package frc.robot.systems.intake;
 
 import edu.wpi.first.math.filter.LinearFilter;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotStates;
 import frc.robot.systems.intake.IntakeVars.Constants;
@@ -55,7 +56,39 @@ public class IntakeSubsystem extends SubsystemBase {
 
     if (calc > Constants.kIntakeCurrentLimit) { safeToSpin = false; }
     else safeToSpin = true;
-}
+  }
+
+  public FunctionalCommand intakeCommand(boolean isIntaking, boolean isCone) {
+    return new FunctionalCommand(() -> {
+      // Init
+    }, 
+
+    () -> {
+      // Exec
+      if (isCone) {
+        if (isIntaking) {
+          intakeIn(true);
+        }
+        else {
+          intakeOut(true);
+        }
+      }
+      else {
+        if (isIntaking) {
+          intakeIn(false);
+        }
+        else {
+          intakeOut(false);
+        }
+      }
+    }, 
+
+    interrupted -> {}, 
+
+    () -> false,
+
+    this);
+  }
 
   @Override
   public void periodic() {

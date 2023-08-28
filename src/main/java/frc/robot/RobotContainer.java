@@ -14,11 +14,14 @@ import frc.robot.systems.arm.ArmSubsystem;
 import frc.robot.systems.drive.DriveSubsystem;
 import frc.robot.systems.intake.IntakeSubsystem;
 import frc.robot.ControllerVars.Objects;
+import frc.robot.auton.AutonManager;
 
 public class RobotContainer {
   private DriveSubsystem robotDrive; 
   private ArmSubsystem robotArm; 
   private IntakeSubsystem robotIntake;
+
+  private AutonManager autonManager;
 
   private SendableChooser<Command> driverChooser;
 
@@ -26,6 +29,8 @@ public class RobotContainer {
     robotDrive = new DriveSubsystem();
     robotArm = new ArmSubsystem();
     robotIntake = new IntakeSubsystem();
+
+    autonManager = new AutonManager(robotDrive, robotArm, robotIntake);
 
     driverChooser = new SendableChooser<>();
     Shuffleboard.getTab("Driver Profiles").add(driverChooser);
@@ -126,6 +131,6 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return robotDrive.getAutonomousCommand();
+    return autonManager.coneMobility();
   }
 }
