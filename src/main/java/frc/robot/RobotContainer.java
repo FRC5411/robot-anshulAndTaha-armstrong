@@ -8,7 +8,6 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import frc.robot.systems.arm.ArmSubsystem;
 import frc.robot.systems.drive.DriveSubsystem;
 import frc.robot.systems.intake.IntakeSubsystem;
@@ -48,13 +47,13 @@ public class RobotContainer {
     // Arm Bindings
     Objects.armHigh
       .whileTrue(robotArm.armPIDTeleop(robotArm, "high"))
-      .whileFalse(new InstantCommand(() -> {robotArm.setArmTeleop(0.0);}));
+      .whileFalse(shouldHoldArm());
     Objects.armMid
       .whileTrue(robotArm.armPIDTeleop(robotArm, "mid"))
-      .whileFalse(new InstantCommand(() -> {robotArm.setArmTeleop(0.0);}));
+      .whileFalse(shouldHoldArm());
     Objects.armLow
       .whileTrue(robotArm.armPIDTeleop(robotArm, "low"))
-      .whileFalse(new InstantCommand(() -> {robotArm.setArmTeleop(0.0);}));
+      .whileFalse(shouldHoldArm());
 
     Objects.toggleMode
       .toggleOnTrue(new InstantCommand(() -> {RobotStates.sIsConeMode = true;}))
@@ -62,25 +61,25 @@ public class RobotContainer {
 
     Objects.armGround
       .whileTrue(robotArm.armPIDTeleop(robotArm, "ground"))
-      .whileFalse(new InstantCommand(() -> {robotArm.setArmTeleop(0.0);}));
+      .whileFalse(shouldHoldArm());
     Objects.armSub
       .whileTrue(robotArm.armPIDTeleop(robotArm, "substation"))
-      .whileFalse(new InstantCommand(() -> {robotArm.setArmTeleop(0.0);}));
+      .whileFalse(shouldHoldArm());
 
     Objects.armIdle
       .whileTrue(robotArm.armPIDTeleop(robotArm, "idle"))
-      .whileFalse(new InstantCommand(() -> {robotArm.setArmTeleop(0.0);}));
+      .whileFalse(shouldHoldArm());
 
     Objects.holdSniper
-      .whileTrue(new InstantCommand(() -> {RobotStates.sDriveSniperMode = true;}))
-      .whileFalse(new InstantCommand(() -> {RobotStates.sDriveSniperMode = false;}));
+      .whileTrue(new InstantCommand(() -> {RobotStates.sArmSniperMode = true;}))
+      .whileFalse(new InstantCommand(() -> {RobotStates.sArmSniperMode = false;}));
 
     Objects.armOut
-      .whileTrue(new InstantCommand(() -> {robotArm.setArmTeleop(0.3); shouldHoldArm(false);}))
-      .whileFalse(new InstantCommand(() -> {robotArm.setArmTeleop(0.0); shouldHoldArm(true);}));
+      .whileTrue(new InstantCommand(() -> {robotArm.setArmTeleop(0.3); RobotStates.sShouldHoldArm = false;}))
+      .whileFalse(shouldHoldArm());
     Objects.armIn
-      .whileTrue(new InstantCommand(() -> {robotArm.setArmTeleop(-0.3); shouldHoldArm(false);}))
-      .whileFalse(new InstantCommand(() -> {robotArm.setArmTeleop(0.0); shouldHoldArm(true);}));
+      .whileTrue(new InstantCommand(() -> {robotArm.setArmTeleop(-0.3); RobotStates.sShouldHoldArm = false;}))
+      .whileFalse(shouldHoldArm());
 
     // Intake Bindings
     Objects.leftBumper
@@ -97,13 +96,13 @@ public class RobotContainer {
       .whileFalse(new InstantCommand(robotIntake :: intakeOff));
   }
 
-  private Command shouldHoldArm(boolean hold) {
-    if (hold) {
-      return robotArm.armFFHold(robotArm);
-    }
-    else {
-      return new PrintCommand("\nRC : shouldHoldArm " + hold);
-    }
+  private Command shouldHoldArm() {
+    return new InstantCommand(() -> {
+      RobotStates.sShouldHoldArm = true;
+
+      robotArm.setArmTeleop(0.0);
+      robotArm.armFFHold(robotArm).schedule();
+    });
   }
 
   public Command getAutonomousCommand() {

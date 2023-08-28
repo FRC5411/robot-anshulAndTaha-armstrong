@@ -104,7 +104,7 @@ public class ArmSubsystem extends SubsystemBase {
         
         armIO.setArm(calc);
 
-        System.out.println("\n\nAS : EXECUTING armPIDTeleop" + "\nAS : ARM CALC " + calc + "\nAS : ARM ANGLE " + ArmIO.getArmAngle() + "\nAS : RETURNED ANGLE " + returnAngle(strSetpoint, RobotStates.sIsConeMode));
+        // System.out.println("\n\nAS : EXECUTING armPIDTeleop" + "\nAS : ARM CALC " + calc + "\nAS : ARM ANGLE " + ArmIO.getArmAngle() + "\nAS : RETURNED ANGLE " + returnAngle(strSetpoint, RobotStates.sIsConeMode));
       }, 
 
       interrupted -> {}, 
@@ -146,5 +146,7 @@ public class ArmSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     SmartDashboard.putNumber("ARM POITION : ", ArmIO.getArmAngle());
+
+
   }
 }
