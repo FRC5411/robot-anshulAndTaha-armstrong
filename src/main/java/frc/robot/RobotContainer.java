@@ -11,13 +11,20 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.systems.arm.ArmSubsystem;
+import frc.robot.systems.drive.ARDriveSubsystem;
+import frc.robot.systems.drive.DriveIO;
+import frc.robot.systems.drive.DriveIOSim;
+import frc.robot.systems.drive.DriveIOSpM;
 import frc.robot.systems.drive.DriveSubsystem;
+import frc.robot.systems.drive.GyroIO;
+import frc.robot.systems.drive.NavXIO;
 import frc.robot.systems.intake.IntakeSubsystem;
+import frc.robot.Constants.Mode;
 import frc.robot.ControllerVars.Objects;
 import frc.robot.auton.AutonManager;
 
 public class RobotContainer {
-  private DriveSubsystem robotDrive; 
+  private ARDriveSubsystem robotDrive; 
   private ArmSubsystem robotArm; 
   private IntakeSubsystem robotIntake;
 
@@ -25,8 +32,12 @@ public class RobotContainer {
 
   private SendableChooser<Command> driverChooser;
 
+  /* ------------------------------------------------------------------------ */
+
+  private DriveSubsystem m_robotDrive;
+
   public RobotContainer() {
-    robotDrive = new DriveSubsystem();
+    robotDrive = new ARDriveSubsystem();
     robotArm = new ArmSubsystem();
     robotIntake = new IntakeSubsystem();
 
@@ -40,6 +51,40 @@ public class RobotContainer {
         () -> Objects.xboxController.getLeftY(), 
         () -> Objects.xboxController.getRightX(), 
         () -> RobotStates.sDriveSniperMode));
+
+    /* ------------------------------------------------------------------------ */
+
+    /* Checks robot mode */
+    if (Constants.getMode() != Mode.REPLAY) {
+      switch (Constants.getRobot()) {
+        case ROBOT_2023S:
+          m_robotDrive = new DriveSubsystem(new DriveIOSpM(), new NavXIO());
+
+          break;
+
+        case ROBOT_SIMBOT:
+          m_robotDrive = new DriveSubsystem(new DriveIOSim(), new GyroIO() {});
+
+          break;
+        
+        default:
+
+          break;
+      }
+    }
+    else {
+      m_robotDrive = new DriveSubsystem(new DriveIO() {}, new GyroIO() {});
+    }    
+
+    /* Sets the drive subsystem's default command (Command that runs when no other commands require drive) */
+    m_robotDrive.setDefaultCommand(
+      m_robotDrive.ArcadeCommand(
+        () -> - Objects.xboxController.getLeftY(), 
+        () -> - Objects.xboxController.getRightX(), 
+        () -> RobotStates.sDriveSniperMode,
+        true
+      )
+    );
 
     configureBindings();
     configureDriveProfiles();

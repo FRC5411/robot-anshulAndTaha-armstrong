@@ -1,113 +1,169 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package frc.robot.systems.drive;
 
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
+
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import java.util.function.DoubleSupplier;
-import java.util.HashMap;
-import java.util.function.BooleanSupplier;
+import frc.robot.systems.drive.DriveVars.Constants;
+import frc.robot.systems.drive.DriveVars.Objects;
 
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-
+/** Drivetrain subsytem class */
 public class DriveSubsystem extends SubsystemBase {
-  private DriveIO IO;
-  private DriveIOSim simIO;
 
-  public DriveSubsystem() {
-    IO = new DriveIO();
-    simIO = new DriveIOSim();
-  }
+    private final DriveIO m_driveIO;
+    private final GyroIO m_gyroIO;
 
-  public Command getAutonomousCommand(String trajectory, boolean useColor, HashMap<String, Command> map, DriveSubsystem robotDrive) {
-    return IO.followPathwithEvents(trajectory, useColor, map, robotDrive);
-  }
+    private final DriveIOInputsAutoLogged m_driveInputs = new DriveIOInputsAutoLogged();
+    private final GyroIOInputsAutoLogged m_gyroInputs = new GyroIOInputsAutoLogged();
 
-  @Override
-  public void periodic() {
-    IO.updateOdometry();
-    IO.telemetry();
-    IO.setField();
-  }
+    /**
+     * Creates a new instance of the drive subsystem.
+     * 
+     * @param driveIO Type of IO the subsystem will be using
+     */
+    public DriveSubsystem(DriveIO driveIO, GyroIO gyroIO) {
+        m_driveIO = driveIO;
+        m_gyroIO = gyroIO;
+    }
 
-  @Override
-  public void simulationPeriodic() {
-    simIO.update();
-    simIO.telemetry();
-    simIO.setField();
-  }
+    @Override
+    public void periodic() {
+        /* Update and process drive motor inputs */
+        m_driveIO.updateInputs(m_driveInputs);
+        Logger.getInstance().processInputs("/systems/drive/driveIO", m_driveInputs);
 
-  public Command arcadeCmd(DoubleSupplier speedSupplier, DoubleSupplier rotationSupplier, BooleanSupplier sniperMode) {
-    return new FunctionalCommand(
-      () -> {},
-      () -> {IO.teleopDrive(
-        speedSupplier.getAsDouble(),
-        rotationSupplier.getAsDouble(), 
-        sniperMode.getAsBoolean());},
-      interrupted -> {},
-      () -> false,
-      this);
-  }
+        /* Update and process gyro inputs (Technically outputs but oh well) */
+        m_gyroIO.updateInputs(m_gyroInputs);
+        Logger.getInstance().processInputs("/systems/drive/gyroIO", m_gyroInputs);
 
-  public Command sniperTrueCmd() {
-    return new InstantCommand(() -> IO.trueSniperMode(), this);
-  }
+        /* Update pose estimator (odometry) */
+        Objects.poseEstimator.update(m_gyroInputs.gyroYawDeg, m_driveInputs.leftFrontPosition, m_driveInputs.rightFrontPosition);
+        Logger.getInstance().recordOutput("/systems/drive/estimatedPose", Objects.poseEstimator.getEstimatedPosition());
 
-  public Command sniperFalseCmd() {
-    return new InstantCommand(() -> IO.falseSniperMode(), this);
-  }
+        /* Update Field2d pose */
+        Objects.field.setRobotPose(Objects.poseEstimator.getEstimatedPosition());
+        SmartDashboard.putData(Objects.field);
+    }
 
-  public Command resetOdometryCmd() {
-    return resetOdometryCmd(new Pose2d());
-  }
+    /**
+     * Sets the wheel speeds using voltage
+     * 
+     * @param leftVolts voltage for the left side
+     * @param rightVolts voltage for the right side
+     */
+    public void setSpeeds(double leftVolts, double rightVolts) {
+        m_driveIO.setVolts(leftVolts, rightVolts);
+    }
 
-  public Command resetOdometryCmd(Pose2d pose) {
-    return new InstantCommand(() -> IO.resetPose(pose), this);
-  }
+    /**
+     * Simple arcade drive method to drive the robot
+     * 
+     * @param yInput Forward speed of the robot (Typically left joystick Y)
+     * @param xInput Rotational speed of the robot (Typically right joystick X)
+     * @param squareInputs Should square inputs (true or false)
+     */
+    public void arcadeDrive(double yInput, double xInput, boolean squareInputs) {
+        var wheelSpeeds = DifferentialDrive.arcadeDriveIK(yInput, xInput, squareInputs);
 
-  public Command autoEngageCmd() {
-    ProfiledPIDController engageController = new ProfiledPIDController(
-      0.0243, //0.0234, //0.027
-      0,
-      0,
-      new TrapezoidProfile.Constraints(1, 0.5));
+        setSpeeds(wheelSpeeds.left * DifferentialDrive.kDefaultMaxOutput, wheelSpeeds.right * DifferentialDrive.kDefaultMaxOutput);
+    }
 
-      engageController.setTolerance(2);
+    /**
+     * An inline command for an Arcade Drive
+     * 
+     * @param yInputSupplier Forward, backward speed
+     * @param xInputSupplier Rotational speed
+     * @param sniperMode Should make robot slower
+     * @param isTeleop Make adjustments to inputs or not
+     * @return A new arcade command
+     */
+    public Command ArcadeCommand(DoubleSupplier yInputSupplier, DoubleSupplier xInputSupplier, BooleanSupplier sniperMode, boolean isTeleop) {
+        return new FunctionalCommand(
+            /* Init Code */
+            () -> {}, 
+            /* Execute Code */
+            () -> {
+                /* Initialise all necessary vars */
+                double ySpeed = yInputSupplier.getAsDouble();
+                double xSpeed = xInputSupplier.getAsDouble();
 
-    double kf = 0.05;
+                double deadzone = Constants.kDeadzone;
+                boolean squareInputs = Constants.kSquareInputs;
+                // NOTE: You must use a boolean supplier for sniper mode 
+                // since in teleop you may want to toggle it or not
+                boolean isSniper = sniperMode.getAsBoolean();
 
-    return new FunctionalCommand(
-      () -> {}, 
-      () -> {
-        IO.arcadeDrive(
-          engageController.calculate(
-            IO.getPitch(), 0) + 
-            kf * Math.signum(engageController.getPositionError()), // accounts for static friction
-            0);
-      }, 
-      interrupted -> {}, 
-      () -> false, 
-      this);
-  }
+                /* If we are using this command in teleop or auton */
+                if (isTeleop) {
+                    /* Check deadzones */
+                    if (Math.abs(ySpeed) < deadzone) { ySpeed = 0.0; }
+                    if (Math.abs(xSpeed) < deadzone) { xSpeed = 0.0; }
 
-  public Command turnCommand(double setpoint) {
-    ProfiledPIDController controller = new ProfiledPIDController(
-      0.03, 
-      0, 
-      0.005, 
-      new TrapezoidProfile.Constraints(180, 90));
+                    /* Check if drive should be in sniper mode */
+                    if (isSniper) {
+                        ySpeed *= Constants.kSniperScaler;
+                        xSpeed *= Constants.kSniperScaler;
+                    }
 
-      double kf = 0.05;
+                    arcadeDrive(ySpeed, xSpeed, squareInputs);
+                }
+                else {
+                    arcadeDrive(ySpeed, xSpeed, false);
+                }
+            }, 
+            /* End Code */
+            // NOTE: interrupted is a boolean
+            interrupted -> {}, 
+            /* Is finished */
+            () -> false, 
+            /* Required subsystems */
+            this);
+    }
 
-    return new FunctionalCommand(
-      () -> { controller.reset(simIO.getHeading().getDegrees());}, 
-      () -> {IO.arcadeDrive(
-        0.0, controller.calculate(simIO.getHeading().getDegrees() % 360, setpoint) 
-        + kf * Math.signum(controller.getPositionError()));}, 
-      interrupted -> {}, 
-      () -> controller.atGoal(), 
-      this);
-  }
+    /**
+     * An inline command to balance on the charge station
+     * 
+     * @return A new balance command
+     */
+     public Command BalanceCommand() {
+        final ProfiledPIDController controller = new ProfiledPIDController(
+            0.0243, 0.0, 0.0, new TrapezoidProfile.Constraints(1.0, 0.5));
+        final double kF = 0.05;
+
+        return new FunctionalCommand(
+            /* Init Code */
+            () -> {}, 
+            /* Execute Code */
+            () -> {
+                // NOTE: xInput and squareInputs should be left to 0.0 and false respectively
+                arcadeDrive(
+                    /* Calculates the drive output and accounts for static friction */
+                    controller.calculate(m_gyroInputs.gyroPitchDeg.getDegrees(), 0.0) + kF * Math.signum(controller.getPositionError()), 
+                    0.0, 
+                    false
+                );
+            }, 
+            /* End Code */
+            // NOTE: interrupted is a boolean
+            interrupted -> {
+                /* Set motor speeds to 0 */
+                arcadeDrive(0.0, 0.0, false);
+            }, 
+            /* Is finished */
+            () -> false, 
+            /* Required subsystems */
+            this);
+     }
 }

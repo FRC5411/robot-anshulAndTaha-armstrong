@@ -9,12 +9,12 @@ import java.util.HashMap;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.systems.arm.ArmSubsystem;
-import frc.robot.systems.drive.DriveSubsystem;
+import frc.robot.systems.drive.ARDriveSubsystem;
 import frc.robot.systems.intake.IntakeSubsystem;
 
 public class AutonManager extends SubsystemBase {
 
-  private DriveSubsystem robotDrive;
+  private ARDriveSubsystem robotDrive;
   private ArmSubsystem robotArm;
   private IntakeSubsystem robotIntake;
 
@@ -22,7 +22,7 @@ public class AutonManager extends SubsystemBase {
   private double inttakeTime;
 
   /** Creates a new AutonManager. */
-  public AutonManager(DriveSubsystem robotDrive, ArmSubsystem robotArm, IntakeSubsystem robotIntake) {
+  public AutonManager(ARDriveSubsystem robotDrive, ArmSubsystem robotArm, IntakeSubsystem robotIntake) {
     this.robotDrive = robotDrive;
     this.robotArm = robotArm;
     this.robotIntake = robotIntake;

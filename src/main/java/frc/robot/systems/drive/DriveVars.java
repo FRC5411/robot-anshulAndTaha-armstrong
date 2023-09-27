@@ -74,6 +74,7 @@ public class DriveVars {
         public static final Vector<N3> kVisionMeasurementStdDevs = VecBuilder.fill(0.1, 0.1, Math.toRadians(200));
 
         public static final double kSniperScaler = 0.4;
+        public static final boolean kSquareInputs = true;
     }
 
     public final static class Objects {
