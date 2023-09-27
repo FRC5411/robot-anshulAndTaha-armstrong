@@ -10,35 +10,36 @@ import frc.robot.systems.drive.DriveVars.Objects;
 public class DriveIOSpM implements DriveIO {
 
     /** Creates a new 'program -> hardware' interface for the SparkMax */
-    public DriveIOSpM() {}
+    public DriveIOSpM() {
+    }
 
     @Override
     public void updateInputs(DriveIOInputs inputs) {
-        inputs.leftFrontPosition = Objects.leftFrontEncoder.getPosition();
-        inputs.leftBackPosition = Objects.leftBackEncoder.getPosition();
-        inputs.rightFrontPosition = Objects.rightFrontEncoder.getPosition();
-        inputs.rightFrontPosition = Objects.rightFrontEncoder.getPosition();
+        inputs.leftFrontPosition = Objects.LEFT_FRONT_ENCODER.getPosition();
+        inputs.leftBackPosition = Objects.LEFT_BACK_ENCODER.getPosition();
+        inputs.rightFrontPosition = Objects.RIGHT_FRONT_ENCODER.getPosition();
+        inputs.rightFrontPosition = Objects.RIGHT_FRONT_ENCODER.getPosition();
 
-        inputs.leftFrontVelocity = Objects.leftFrontEncoder.getVelocity();
-        inputs.leftBackVelocity = Objects.leftBackEncoder.getVelocity();
-        inputs.rightFrontVelocity = Objects.rightFrontEncoder.getVelocity();
-        inputs.rightFrontVelocity = Objects.rightFrontEncoder.getVelocity();
-        
-        inputs.leftFrontTemperatureC = Objects.leftFront.getMotorTemperature();
-        inputs.leftBackTemperatureC = Objects.leftBack.getMotorTemperature();
-        inputs.rightFrontTemperatureC = Objects.rightFront.getMotorTemperature();
-        inputs.rightFrontTemperatureC = Objects.rightFront.getMotorTemperature();
+        inputs.leftFrontVelocity = Objects.LEFT_FRONT_ENCODER.getVelocity();
+        inputs.leftBackVelocity = Objects.LEFT_BACK_ENCODER.getVelocity();
+        inputs.rightFrontVelocity = Objects.RIGHT_FRONT_ENCODER.getVelocity();
+        inputs.rightFrontVelocity = Objects.RIGHT_FRONT_ENCODER.getVelocity();
 
-        inputs.leftFrontAppliedCurrent = Objects.leftFront.getOutputCurrent();
-        inputs.leftBackAppliedCurrent = Objects.leftBack.getOutputCurrent();
-        inputs.rightFrontAppliedCurrent = Objects.rightFront.getOutputCurrent();
-        inputs.rightFrontAppliedCurrent = Objects.rightFront.getOutputCurrent();
+        inputs.leftFrontTemperatureC = Objects.LEFT_FRONT_MOTOR.getMotorTemperature();
+        inputs.leftBackTemperatureC = Objects.LEFT_BACK_MOTOR.getMotorTemperature();
+        inputs.rightFrontTemperatureC = Objects.RIGHT_FRONT_MOTOR.getMotorTemperature();
+        inputs.rightFrontTemperatureC = Objects.RIGHT_FRONT_MOTOR.getMotorTemperature();
+
+        inputs.leftFrontAppliedCurrent = Objects.LEFT_FRONT_MOTOR.getOutputCurrent();
+        inputs.leftBackAppliedCurrent = Objects.LEFT_BACK_MOTOR.getOutputCurrent();
+        inputs.rightFrontAppliedCurrent = Objects.RIGHT_FRONT_MOTOR.getOutputCurrent();
+        inputs.rightFrontAppliedCurrent = Objects.RIGHT_FRONT_MOTOR.getOutputCurrent();
     }
 
     public void setVolts(double leftVolts, double rightVolts) {
-        Objects.leftFront.setVoltage(leftVolts);
-        Objects.leftBack.setVoltage(leftVolts);
-        Objects.rightFront.setVoltage(rightVolts);
-        Objects.rightBack.setVoltage(rightVolts);
+        Objects.LEFT_FRONT_MOTOR.setVoltage(leftVolts);
+        Objects.LEFT_BACK_MOTOR.setVoltage(leftVolts);
+        Objects.RIGHT_FRONT_MOTOR.setVoltage(rightVolts);
+        Objects.RIGHT_BACK_MOTOR.setVoltage(rightVolts);
     }
 }

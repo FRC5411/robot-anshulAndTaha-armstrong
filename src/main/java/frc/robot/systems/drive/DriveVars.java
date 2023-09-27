@@ -27,100 +27,126 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 
 public class DriveVars {
+    /**
+     * Variables that do not ever change
+     */
     public final static class Constants {
-        // Motor and Tank constants
-        public static final int kLeftFrontID = 11;
-        public static final int kLeftBackID = 12;
-        public static final int kRightFrontID = 13;
-        public static final int kRightBackID = 14;
+        /* Motor constants */
+        public static final int LEFT_FRONT_ID = 11;
+        public static final int LEFT_BACK_ID = 12;
+        public static final int RIGHT_FRONT_ID = 13;
+        public static final int RIGHT_BACK_ID = 14;
 
-        public static final boolean kLeftInvert = false;
-        public static final boolean kRightInvert = false;
+        public static final boolean LEFT_INVERT = true;
+        public static final boolean RIGHT_INVERT = false;
 
-        public static final double kWheelRadiusMeters = 0.0762;
-        public static final double kGearRatio = 7.89;
+        /* Motor adjustments */
+        public static final double SPEED_SCALER = 0.4;
+        public static final double ROTATION_SCALER = 0.6;
 
-        public static final double kMassKg = 125;
+        /* Physical properties */
+        public static final double WHEEL_RADIUS_M = 0.0762;
+        public static final double TRACK_WIDTH_M = Units.inchesToMeters(21);
 
-        // Arbitrary
+        public static final double GEAR_RATIO = 7.89;
+
+        public static final double MASS_KG = 125;
+
         public static final double kMOIKGMeterSquared = 10;
+        public static final double SCALED_CF = Units.inchesToMeters(1 / GEAR_RATIO * 2 * Math.PI * WHEEL_RADIUS_M)
+                * (2.16 / 0.548);
 
-        // Odometry
-        // public static final double kConversionFactor = (2 * Math.PI * kWheelRadiusMeters) / kGearRatio;
-        // public static final double kSF = (2.16/0.548);
-        public static final double kScaledCF = Units.inchesToMeters(1 / kGearRatio * 2 * Math.PI * kWheelRadiusMeters) * (2.16/0.548);
+        /* Kinematics */
+        public static final DifferentialDriveKinematics DRIVE_KINEMATICS = new DifferentialDriveKinematics(
+                TRACK_WIDTH_M);
 
-        // Path Planner
-        public static final double kTrackWidthMeters = Units.inchesToMeters(21);
+        /* Path planner constants */
+        public static final double RAMSETE_B = 2;
+        public static final double RAMSETE_ZETA = 0.7;
 
-        public static final double kRamseteB = 2;
-        public static final double kRamseteZeta = 0.7; 
-        public static final DifferentialDriveKinematics kTankKinematics = 
-                            new DifferentialDriveKinematics(kTrackWidthMeters);
+        /* Controller constants */
+        public static final double DRIVE_VOLTS = 0.14592; // kS
+        public static final double DRIVE_VOLTS_MPS = 2.0809; // kV
+        public static final double DRIVE_VOLTS_MSPS = 0.83925; // kA
 
-        public static final double kVolts = 0.14592; //kS
-        public static final double kVoltsMPS = 2.0809; //kV
-        public static final double kVoltsMSPS = 0.83925; //kA
-
-        public static final double kPDrive = 0.0012;
-        public static final double kIDrive = 0;
-        public static final double kDDrive = 0;
-
-        // Deadzones
-        public static final double kDeadzone = 0.1; // For IOSim only
-        public static final double kRotationScaler = 0.6;
+        public static final double DRIVE_PP_P = 0.0012;
+        public static final double DRIVE_PP_I = 0;
+        public static final double DRIVE_PP_D = 0;
 
         // Vision
-        public static final Vector<N3> kVisionMeasurementStdDevs = VecBuilder.fill(0.1, 0.1, Math.toRadians(200));
-
-        public static final double kSniperScaler = 0.4;
-        public static final boolean kSquareInputs = true;
+        public static final Vector<N3> VISION_MEASUREMENT_STD_DEV = VecBuilder.fill(0.1, 0.1, Math.toRadians(200));
     }
 
+    /**
+     * Variables that may change, this should be used spareingly
+     */
+    public static class Vars {
+        /* Driver preferences */
+        public static boolean SQUARE_INPUTS = true;
+        public static double DEADZONE = 0.0;
+    }
+
+    /**
+     * Objects that the subsystem uses, such as motors, position estimators, etc.
+     */
     public final static class Objects {
-        public static final CANSparkMax leftFront = Configs.NEO(Constants.kLeftFrontID, Constants.kLeftInvert);
-        public static final CANSparkMax leftBack = Configs.NEO(Constants.kLeftBackID, Constants.kLeftInvert, leftFront);
-        public static final CANSparkMax rightFront = Configs.NEO(Constants.kRightFrontID, Constants.kRightInvert);
-        public static final CANSparkMax rightBack = Configs.NEO(Constants.kRightBackID, Constants.kRightInvert, rightFront);
+        /* Motors */
+        public static final CANSparkMax LEFT_FRONT_MOTOR = Configs.NEO(Constants.LEFT_FRONT_ID, Constants.LEFT_INVERT);
+        public static final CANSparkMax LEFT_BACK_MOTOR = Configs.NEO(Constants.LEFT_BACK_ID, Constants.LEFT_INVERT,
+                LEFT_FRONT_MOTOR);
+        public static final CANSparkMax RIGHT_FRONT_MOTOR = Configs.NEO(Constants.RIGHT_FRONT_ID,
+                Constants.RIGHT_INVERT);
+        public static final CANSparkMax RIGHT_BACK_MOTOR = Configs.NEO(Constants.RIGHT_BACK_ID, Constants.RIGHT_INVERT,
+                RIGHT_FRONT_MOTOR);
 
-        public static final RelativeEncoder leftFrontEncoder = Configs.RelativeEncoder(leftFront, Constants.kScaledCF);
-        public static final RelativeEncoder leftBackEncoder = Configs.RelativeEncoder(leftBack, Constants.kScaledCF);
-        public static final RelativeEncoder rightFrontEncoder = Configs.RelativeEncoder(rightFront, Constants.kScaledCF);
-        public static final RelativeEncoder rightBackEncoder = Configs.RelativeEncoder(rightBack, Constants.kScaledCF);
+        /* Encoders */
+        public static final RelativeEncoder LEFT_FRONT_ENCODER = Configs.RelativeEncoder(LEFT_FRONT_MOTOR,
+                Constants.SCALED_CF);
+        public static final RelativeEncoder LEFT_BACK_ENCODER = Configs.RelativeEncoder(LEFT_BACK_MOTOR,
+                Constants.SCALED_CF);
+        public static final RelativeEncoder RIGHT_FRONT_ENCODER = Configs.RelativeEncoder(RIGHT_FRONT_MOTOR,
+                Constants.SCALED_CF);
+        public static final RelativeEncoder RIGHT_BACK_ENCODER = Configs.RelativeEncoder(RIGHT_BACK_MOTOR,
+                Constants.SCALED_CF);
 
-        public static final RamseteController ramseteController = new RamseteController(Constants.kRamseteB, Constants.kRamseteZeta);
+        /* Controllers */
+        public static final RamseteController DRIVE_RAMSETE_CONTROLLER = new RamseteController(Constants.RAMSETE_B,
+                Constants.RAMSETE_ZETA);
 
-        public static final SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(
-            Constants.kVolts, Constants.kVoltsMPS, Constants.kVoltsMSPS);
+        public static final SimpleMotorFeedforward DRIVE_FEEDFORWARD = new SimpleMotorFeedforward(
+                Constants.DRIVE_VOLTS, Constants.DRIVE_VOLTS_MPS, Constants.DRIVE_VOLTS_MSPS);
 
-        public static final DifferentialDrive robotDrive = new DifferentialDrive(leftFront, rightFront);
+        /* Drive */
+        public static final DifferentialDrive ROBOT_DRIVE = new DifferentialDrive(LEFT_FRONT_MOTOR, RIGHT_FRONT_MOTOR);
 
-        public static final AHRS navX = new AHRS();
+        /* Odometry */
+        public static final AHRS NAVX = new AHRS();
 
-        public static final DifferentialDrivePoseEstimator poseEstimator = new DifferentialDrivePoseEstimator(
-            Constants.kTankKinematics, new Rotation2d(), 0, 0, new Pose2d());
+        public static final DifferentialDrivePoseEstimator ROBOT_POSE_ESTIMATOR = new DifferentialDrivePoseEstimator(
+                Constants.DRIVE_KINEMATICS, new Rotation2d(), 0, 0, new Pose2d());
 
-        public static final Field2d field = new Field2d();
+        public static final Field2d ROBOT_FIELD = new Field2d();
     }
 
+    /**
+     * Objects and variables used for simulation
+     */
     public final static class Simulation {
         public static double lasttime = 0;
 
-        public static final Field2d field = new Field2d();
+        PWMSparkMax leftFrontMotorSIM = new PWMSparkMax(Constants.LEFT_FRONT_ID);
+        PWMSparkMax leftBackMotorSIM = new PWMSparkMax(Constants.LEFT_BACK_ID);
 
-        PWMSparkMax m_leftFront = new PWMSparkMax(Constants.kLeftFrontID);
-        PWMSparkMax m_leftBack = new PWMSparkMax(Constants.kLeftBackID);
-        
-        public static final LinearSystem<N2, N2, N2> m_drivetrainSystem =
-        LinearSystemId.identifyDrivetrainSystem(1.98, 0.2, 1.5, 0.3);
+        public static final LinearSystem<N2, N2, N2> DRIVE_SYSTEM = LinearSystemId.identifyDrivetrainSystem(1.98, 0.2,
+                1.5, 0.3);
 
-        public static final DifferentialDrivetrainSim driveSim = new DifferentialDrivetrainSim(
-            DCMotor.getNEO(2),
-            Constants.kGearRatio,
-            Constants.kMassKg,
-            Constants.kMOIKGMeterSquared,
-            Constants.kWheelRadiusMeters,
-            Constants.kTrackWidthMeters,
-            VecBuilder.fill(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
+        public static final DifferentialDrivetrainSim DRIVE_SIMULATOR = new DifferentialDrivetrainSim(
+                DCMotor.getNEO(2),
+                Constants.GEAR_RATIO,
+                Constants.MASS_KG,
+                Constants.kMOIKGMeterSquared,
+                Constants.WHEEL_RADIUS_M,
+                Constants.TRACK_WIDTH_M,
+                VecBuilder.fill(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
     }
 }

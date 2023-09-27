@@ -32,8 +32,10 @@ public interface DriveIO {
     }
 
     /** Updates the set of loggable inputs. */
-    public default void updateInputs(DriveIOInputs inputs) {}
+    public default void updateInputs(DriveIOInputs inputs) {
+    }
 
     /** Sets the voltage of the left and right side of the drivetrain */
-    public default void setVolts(double leftVolts, double rightVolts) {}
+    public default void setVolts(double leftVolts, double rightVolts) {
+    }
 }

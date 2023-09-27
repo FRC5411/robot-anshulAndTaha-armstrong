@@ -17,5 +17,6 @@ public interface GyroIO {
     }
 
     /** Update the Gyro's inputs */
-    public default void updateInputs(GyroIOInputs inputs) {}
+    public default void updateInputs(GyroIOInputs inputs) {
+    }
 }

@@ -10,7 +10,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.RobotStates;
 import frc.robot.systems.arm.ArmVars.Constants;
 
 public class ArmSubsystem extends SubsystemBase {
@@ -69,7 +68,7 @@ public class ArmSubsystem extends SubsystemBase {
       () -> System.out.println("Command HOLD ARM COMMAND has started"),
       // Exec
       () -> {
-        if(RobotStates.sShouldHoldArm){
+        if(true /* RobotStates.ShouldHoldArm */){
           double calc = feedForward.calculate(ArmIO.getXAxisArmAngle(), 0);
     
           armIO.setArm(calc);
@@ -100,7 +99,7 @@ public class ArmSubsystem extends SubsystemBase {
       }, () -> {
 
       // Exec
-        double calc = pid.calculate(ArmIO.getArmAngle(), returnAngle(strSetpoint, RobotStates.sIsConeMode));
+        double calc = pid.calculate(ArmIO.getArmAngle(), returnAngle(strSetpoint, true /* RobotStates.isConeMode */));
         
         armIO.setArm(calc);
 

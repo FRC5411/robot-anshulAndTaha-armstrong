@@ -6,176 +6,39 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import frc.robot.systems.arm.ArmSubsystem;
-import frc.robot.systems.drive.ARDriveSubsystem;
-import frc.robot.systems.drive.DriveIO;
-import frc.robot.systems.drive.DriveIOSim;
-import frc.robot.systems.drive.DriveIOSpM;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import frc.robot.systems.drive.DriveSubsystem;
-import frc.robot.systems.drive.GyroIO;
-import frc.robot.systems.drive.NavXIO;
-import frc.robot.systems.intake.IntakeSubsystem;
-import frc.robot.Constants.Mode;
 import frc.robot.ControllerVars.Objects;
-import frc.robot.auton.AutonManager;
+import frc.robot.structure.robot.SystemVerification;
 
 public class RobotContainer {
-  private ARDriveSubsystem robotDrive; 
-  private ArmSubsystem robotArm; 
-  private IntakeSubsystem robotIntake;
 
-  private AutonManager autonManager;
+  private static SystemVerification m_robotVerification = new SystemVerification();
 
-  private SendableChooser<Command> driverChooser;
-
-  /* ------------------------------------------------------------------------ */
-
-  private DriveSubsystem m_robotDrive;
+  private static DriveSubsystem m_robotDrive = m_robotVerification.verifyRobotDrive();
 
   public RobotContainer() {
-    robotDrive = new ARDriveSubsystem();
-    robotArm = new ArmSubsystem();
-    robotIntake = new IntakeSubsystem();
-
-    autonManager = new AutonManager(robotDrive, robotArm, robotIntake);
-
-    driverChooser = new SendableChooser<>();
-    Shuffleboard.getTab("Driver Profiles").add(driverChooser);
-
-    robotDrive.setDefaultCommand(
-      robotDrive.arcadeCmd(
-        () -> Objects.xboxController.getLeftY(), 
-        () -> Objects.xboxController.getRightX(), 
-        () -> RobotStates.sDriveSniperMode));
-
-    /* ------------------------------------------------------------------------ */
-
-    /* Checks robot mode */
-    if (Constants.getMode() != Mode.REPLAY) {
-      switch (Constants.getRobot()) {
-        case ROBOT_2023S:
-          m_robotDrive = new DriveSubsystem(new DriveIOSpM(), new NavXIO());
-
-          break;
-
-        case ROBOT_SIMBOT:
-          m_robotDrive = new DriveSubsystem(new DriveIOSim(), new GyroIO() {});
-
-          break;
-        
-        default:
-
-          break;
-      }
-    }
-    else {
-      m_robotDrive = new DriveSubsystem(new DriveIO() {}, new GyroIO() {});
-    }    
-
-    /* Sets the drive subsystem's default command (Command that runs when no other commands require drive) */
+    /*
+     * Sets the drive subsystem's default command (Command that runs when no other
+     * commands require drive)
+     */
     m_robotDrive.setDefaultCommand(
-      m_robotDrive.ArcadeCommand(
-        () -> - Objects.xboxController.getLeftY(), 
-        () -> - Objects.xboxController.getRightX(), 
-        () -> RobotStates.sDriveSniperMode,
-        true
-      )
-    );
+        // NOTE: Joysticks are inverted on XboxController by default, so we need to
+        // un-invert them
+        m_robotDrive.ArcadeCommand(
+            () -> -Objects.xboxController.getLeftY(),
+            () -> -Objects.xboxController.getLeftX(),
+            () -> Objects.xboxController.leftTrigger().getAsBoolean(),
+            true));
 
     configureBindings();
-    configureDriveProfiles();
   }
 
   private void configureBindings() {
-    // Drive Bindings
-    // Objects.a.onTrue(robotDrive.autoEngageCmd()); // Auto Engage no work DO NOT RUN THIS
-    // Objects.b.onTrue(robotDrive.turnCommand(180));
-    Objects.y
-      .onTrue(robotDrive.resetOdometryCmd());
-
-    Objects.leftTrigger
-      .whileTrue(robotDrive.sniperTrueCmd());
-    Objects.rightTrigger
-      .whileTrue(robotDrive.sniperFalseCmd());
-
-    // Arm Bindings
-    Objects.armHigh
-      .whileTrue(robotArm.armPIDTeleop(robotArm, "high"))
-      .whileFalse(shouldHoldArm());
-    Objects.armMid
-      .whileTrue(robotArm.armPIDTeleop(robotArm, "mid"))
-      .whileFalse(shouldHoldArm());
-    Objects.armLow
-      .whileTrue(robotArm.armPIDTeleop(robotArm, "low"))
-      .whileFalse(shouldHoldArm());
-
-    Objects.toggleMode
-      .toggleOnTrue(new InstantCommand(() -> {RobotStates.sIsConeMode = true;}))
-      .toggleOnFalse(new InstantCommand(() -> {RobotStates.sIsConeMode = false;}));
-
-    Objects.armGround
-      .whileTrue(robotArm.armPIDTeleop(robotArm, "ground"))
-      .whileFalse(shouldHoldArm());
-    Objects.armSub
-      .whileTrue(robotArm.armPIDTeleop(robotArm, "substation"))
-      .whileFalse(shouldHoldArm());
-
-    Objects.armIdle
-      .whileTrue(robotArm.armPIDTeleop(robotArm, "idle"))
-      .whileFalse(shouldHoldArm());
-
-    Objects.holdSniper
-      .whileTrue(new InstantCommand(() -> {RobotStates.sArmSniperMode = true;}))
-      .whileFalse(new InstantCommand(() -> {RobotStates.sArmSniperMode = false;}));
-
-    Objects.armOut
-      .whileTrue(new InstantCommand(() -> {robotArm.setArmTeleop(0.3); RobotStates.sShouldHoldArm = false;}))
-      .whileFalse(shouldHoldArm());
-    Objects.armIn
-      .whileTrue(new InstantCommand(() -> {robotArm.setArmTeleop(-0.3); RobotStates.sShouldHoldArm = false;}))
-      .whileFalse(shouldHoldArm());
-
-    // Intake Bindings
-    Objects.leftBumper
-      .whileTrue(new InstantCommand(robotIntake :: intakeIn))
-      .whileFalse(new InstantCommand(robotIntake :: intakeOff));
-    Objects.rightBumper
-      .whileTrue(new InstantCommand(robotIntake :: intakeOut))
-      .whileFalse(new InstantCommand(robotIntake :: intakeOff));
-    Objects.intakeButton
-      .whileTrue(new InstantCommand(robotIntake :: intakeIn))
-      .whileFalse(new InstantCommand(robotIntake :: intakeOff));
-    Objects.outtakeButton
-      .whileTrue(new InstantCommand(robotIntake :: intakeOut))
-      .whileFalse(new InstantCommand(robotIntake :: intakeOff));
-  }
-
-  private void configureDriveProfiles() {
-    driverChooser.addOption("Aaron", new InstantCommand(() -> {
-      RobotStates.sDeadzones = 0.1;
-      RobotStates.sShouldSquareInputs = true;
-    }));
-    
-    driverChooser.addOption("System Defaults", new InstantCommand(() -> {
-      RobotStates.sDeadzones = 0.0;
-      RobotStates.sShouldSquareInputs = false;
-    }));
-  }
-
-  private Command shouldHoldArm() {
-    return new InstantCommand(() -> {
-      RobotStates.sShouldHoldArm = true;
-
-      robotArm.setArmTeleop(0.0);
-      robotArm.armFFHold(robotArm).schedule();
-    });
   }
 
   public Command getAutonomousCommand() {
-    return autonManager.coneMobility();
+    return new PrintCommand("No autonomous configured");
   }
 }

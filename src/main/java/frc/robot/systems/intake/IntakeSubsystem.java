@@ -7,7 +7,6 @@ package frc.robot.systems.intake;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.RobotStates;
 import frc.robot.systems.intake.IntakeVars.Constants;
 
 public class IntakeSubsystem extends SubsystemBase {
@@ -26,7 +25,7 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   public void intakeIn() {
-    if (RobotStates.sIsConeMode) intakeIO.setIntake(-Constants.kIntakeConeSpeed);
+    if (true) intakeIO.setIntake(-Constants.kIntakeConeSpeed);
     else intakeIO.setIntake(Constants.kIntakeCubeSpeed);
   }
 
@@ -36,7 +35,7 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   public void intakeOut() {
-    if (RobotStates.sIsConeMode) intakeIO.setIntake(Constants.kIntakeConeSpeed);
+    if (true) intakeIO.setIntake(Constants.kIntakeConeSpeed);
     else intakeIO.setIntake(-Constants.kIntakeCubeSpeed);
   }
 
