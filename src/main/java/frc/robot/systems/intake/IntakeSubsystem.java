@@ -26,17 +26,17 @@ public class IntakeSubsystem extends SubsystemBase {
 
   public void intakeIn() {
     if (true) intakeIO.setIntake(-Constants.kIntakeConeSpeed);
-    else intakeIO.setIntake(Constants.kIntakeCubeSpeed);
+    //else intakeIO.setIntake(Constants.kIntakeCubeSpeed);
   }
 
   public void intakeIn(boolean isCone) {
     if (isCone) intakeIO.setIntake(-Constants.kIntakeConeSpeed);
-    else intakeIO.setIntake(Constants.kIntakeCubeSpeed);
+    //else intakeIO.setIntake(Constants.kIntakeCubeSpeed);
   }
 
   public void intakeOut() {
     if (true) intakeIO.setIntake(Constants.kIntakeConeSpeed);
-    else intakeIO.setIntake(-Constants.kIntakeCubeSpeed);
+    //else intakeIO.setIntake(-Constants.kIntakeCubeSpeed);
   }
 
   public void intakeOut(boolean isCone) {

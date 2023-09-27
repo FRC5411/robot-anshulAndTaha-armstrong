@@ -69,13 +69,17 @@ public class DriveSubsystem extends SubsystemBase {
     Simulation.DRIVE_SIMULATOR.update(0.02);
   }
 
+  public void resetGyroYaw() {
+    Objects.NAVX.reset();
+  }
+
   /**
    * Sets the wheel speeds using voltage
    * 
    * @param leftVolts  voltage for the left side
    * @param rightVolts voltage for the right side
    */
-  public void setSpeeds(double leftVolts, double rightVolts) {
+  public void setSpeeds(final double leftVolts, final double rightVolts) {
     m_driveIO.setVolts(leftVolts, rightVolts);
   }
 
@@ -87,7 +91,7 @@ public class DriveSubsystem extends SubsystemBase {
    *                     X)
    * @param squareInputs Should square inputs (true or false)
    */
-  public void arcadeDrive(double yInput, double xInput, boolean squareInputs) {
+  public void arcadeDrive(final double yInput, final double xInput, final boolean squareInputs) {
     var wheelSpeeds = DifferentialDrive.arcadeDriveIK(yInput, xInput, squareInputs);
 
     setSpeeds(wheelSpeeds.left * DifferentialDrive.kDefaultMaxOutput,
