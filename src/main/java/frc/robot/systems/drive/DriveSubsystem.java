@@ -34,10 +34,15 @@ public class DriveSubsystem extends SubsystemBase {
    * Creates a new instance of the drive subsystem.
    * 
    * @param driveIO Type of IO the subsystem will be using
+   * @param gyroIO Type of IO the gyro will be using
    */
   public DriveSubsystem(DriveIO driveIO, GyroIO gyroIO) {
     m_driveIO = driveIO;
     m_gyroIO = gyroIO;
+
+    // Need to calibrate and reset the heading
+    Objects.NAVX.calibrate();
+    resetGyroYaw();
   }
 
   @Override
