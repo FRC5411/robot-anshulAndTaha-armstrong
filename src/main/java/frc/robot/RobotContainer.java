@@ -9,6 +9,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import frc.robot.systems.drive.DriveSubsystem;
 import frc.robot.structure.operator.ButtonMap.Objects;
@@ -23,7 +24,7 @@ public class RobotContainer {
 
   private static DriveSubsystem m_robotDrive = m_robotVerification.verifyRobotDrive();
 
-  private static SendableChooser<Runnable> m_driverChooser = new SendableChooser<>();
+  private static SendableChooser<Command> m_driverChooser = new SendableChooser<>();
 
   public Profile m_driverProfile;
 
@@ -42,14 +43,37 @@ public class RobotContainer {
             true));
 
     Shuffleboard.getTab("Driver").add(m_driverChooser);
-    m_driverChooser.setDefaultOption("SystemDefaults", () -> { m_driverProfile = new SystemDefault(); });
-    m_driverChooser.addOption("Aaron", () -> { m_driverProfile = new Aaron(); });
+    m_driverChooser.setDefaultOption("SystemDefaults", setProfile(new SystemDefault()));
+    m_driverChooser.addOption("Aaron", setProfile(new Aaron()));
 
     configureBindings();
   }
 
   private void configureBindings() {
     m_driverProfile.configureBindings(m_robotDrive);
+  }
+
+  /**
+   * Command to initialize profiles when teleop is enabled
+   * 
+   * @return Command to set the selected profile
+   */
+  public Command initProfiles() {
+    return m_driverChooser.getSelected();
+  }
+
+  /**
+   * Command to set the profile and update the button bindings
+   * 
+   * @param profile Selected driver profile
+   * @return InstantCommand() that sets the profile instance var and calls
+   *         configureBindings()
+   */
+  private Command setProfile(Profile profile) {
+    return new InstantCommand(() -> {
+      m_driverProfile = profile;
+      configureBindings();
+    });
   }
 
   public Command getAutonomousCommand() {

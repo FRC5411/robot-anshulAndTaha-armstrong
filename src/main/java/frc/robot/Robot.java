@@ -135,6 +135,9 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
+
+    /* Schedule the initProfiles command when enabled. Runs once */
+    robotContainer.initProfiles().schedule();
   }
 
   /** This function is called periodically during operator control. */

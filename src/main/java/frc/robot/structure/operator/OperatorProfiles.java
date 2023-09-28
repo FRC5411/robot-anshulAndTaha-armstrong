@@ -14,7 +14,7 @@ public class OperatorProfiles {
 
     public interface Profile {
         public double deadzones = 0.0;
-        public double squareInputs = 0.0;
+        public boolean squareInputs = false;
         /**
          * Configures controller bindings for the driver
          * 
