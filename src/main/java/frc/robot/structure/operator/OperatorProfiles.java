@@ -7,6 +7,7 @@ package frc.robot.structure.operator;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.structure.operator.ButtonMap.Objects;
 import frc.robot.systems.drive.DriveSubsystem;
+import frc.robot.systems.drive.DriveVars.Vars;
 import frc.robot.utils.PilotProfile;
 
 /** Class to store all operator profiles */
@@ -15,12 +16,16 @@ public class OperatorProfiles {
     public interface Profile {
         public double deadzones = 0.0;
         public boolean squareInputs = false;
+
+        public PilotProfile profile = null;
+
         /**
-         * Configures controller bindings for the driver
+         * Configures controller bindings for the driver as well as preferred settings
          * 
          * @param robotDrive Required subsystem
          */
-        public default void configureBindings(DriveSubsystem robotDrive) {}
+        public default void configureBindings(DriveSubsystem robotDrive) {
+        }
     }
 
     /** System default settings */
@@ -36,13 +41,15 @@ public class OperatorProfiles {
         private final boolean squareInputs = false;
 
         /* Create profile */
-        public final PilotProfile profile = new PilotProfile(NAME).addPreference(DEADZONE, () -> deadzones)
+        public PilotProfile profile = new PilotProfile(NAME).addPreference(DEADZONE, () -> deadzones)
                 .addPreference(SQUARE_INPUTS, () -> squareInputs)
                 .addKeybind(B_RESET_GYRO, Objects.DRIVER_CONTROLLER.y());
 
         @Override
         public void configureBindings(DriveSubsystem robotDrive) {
             profile.getKeybind(B_RESET_GYRO).onTrue(Commands.runOnce(robotDrive::resetGyroYaw, robotDrive));
+            Vars.DEADZONE = (Double) profile.getPreference(DEADZONE);
+            Vars.SQUARE_INPUTS = (Boolean) profile.getPreference(SQUARE_INPUTS);
         }
     }
 
@@ -59,13 +66,15 @@ public class OperatorProfiles {
         private final boolean squareInputs = true;
 
         /* Create profile */
-        public final PilotProfile profile = new PilotProfile(NAME).addPreference(DEADZONE, () -> deadzones)
+        public PilotProfile profile = new PilotProfile(NAME).addPreference(DEADZONE, () -> deadzones)
                 .addPreference(SQUARE_INPUTS, () -> squareInputs)
                 .addKeybind(B_RESET_GYRO, Objects.DRIVER_CONTROLLER.y());
 
         @Override
         public void configureBindings(DriveSubsystem robotDrive) {
             profile.getKeybind(B_RESET_GYRO).onTrue(Commands.runOnce(robotDrive::resetGyroYaw, robotDrive));
+            Vars.DEADZONE = (Double) profile.getPreference(DEADZONE);
+            Vars.SQUARE_INPUTS = (Boolean) profile.getPreference(SQUARE_INPUTS);
         }
     }
 }
