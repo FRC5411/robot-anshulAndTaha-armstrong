@@ -4,45 +4,21 @@
 
 package frc.robot.systems.arm;
 
-import frc.robot.systems.arm.ArmVars.Constants;
-import frc.robot.systems.arm.ArmVars.Objects;
-import frc.robot.utils.Conversions;
+import org.littletonrobotics.junction.AutoLog;
 
-public class ArmIO {
-    public ArmIO() {}
-    
-    public static double getArmAngle(){
-        return Conversions.boreEncTicksToDeg(Objects.armBoreEncoder.getDistance(), Constants.kArmGearRatio);
+/** Class to interface with the drive subsytem */
+public interface ArmIO {
+    @AutoLog
+    public static class ArmIOInputs {
+        public double armPosition = 0.0;
+        public double armVelocity = 0.0;
+        public double armTemperatureC = 0.0;
+        public double armAppliedCurrent = 0.0;
     }
 
-    // WARNING: Limits for arm will not work if setArm isn't being updated periodically
-    public void setArm(double speed){
-        if(safeToMoveArm(speed)) { Objects.armMotor.set(speed); }
-    }
+    /** Update the set of loggable inputs */
+    public default void updateInputs(ArmIOInputs inputs) {}
 
-    // WARNING: Limits for arm will not work if setArm isn't being updated periodically
-    public void setArmReduc(double speed){
-        if(safeToMoveArm(speed)) Objects.armMotor.set(speed * (Constants.kSpeedPercentage * 0.01));
-    }
-
-    public static double getXAxisArmAngle() {
-        double ffAngleDegs = getArmAngle() - Constants.kFlatAngle;
-
-        if(ffAngleDegs < 0) ffAngleDegs += 360;
-        
-        return Math.toRadians(ffAngleDegs);
-    }
-
-    public boolean safeToMoveArm(double desiredSpeed) {
-        double armPosition = getArmAngle();
-
-        if ((armPosition > 263 && desiredSpeed > 0) || 
-            (armPosition < 3 && desiredSpeed < 0)) {
-            setArm(0);
-            return false;
-        };
-
-        return true;
-      }
-
+    /** Sets the voltage of the arm motor */
+    public default void setVolts(double volts) {}
 }

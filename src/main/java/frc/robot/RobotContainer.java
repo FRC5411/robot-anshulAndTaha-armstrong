@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
+import frc.robot.systems.arm.ArmSubsystem;
 import frc.robot.systems.drive.DriveSubsystem;
 import frc.robot.structure.operator.ButtonMap.Objects;
 import frc.robot.structure.operator.OperatorProfiles.Aaron;
@@ -23,10 +24,11 @@ public class RobotContainer {
   private static SystemVerification m_robotVerification = new SystemVerification();
 
   private static DriveSubsystem m_robotDrive = m_robotVerification.verifyRobotDrive();
+  private static ArmSubsystem m_robotArm = m_robotVerification.verifyRobotArm();
 
   private static SendableChooser<Command> m_driverChooser = new SendableChooser<>();
 
-  public Profile m_driverProfile;
+  public Profile m_driverProfile = new SystemDefault();
 
   public RobotContainer() {
     /*
@@ -42,6 +44,11 @@ public class RobotContainer {
             () -> Objects.DRIVER_CONTROLLER.leftTrigger().getAsBoolean(),
             true));
 
+    /* Set the default command for the arm subsystem to hold it's last position */
+    m_robotArm.setDefaultCommand(
+        // NOTE: Setpoint does nothing since isHolding is true
+        m_robotArm.MoveArmCommand("HOLD", true));
+
     Shuffleboard.getTab("Driver").add(m_driverChooser);
     m_driverChooser.setDefaultOption("SystemDefaults", setProfile(new SystemDefault()));
     m_driverChooser.addOption("Aaron", setProfile(new Aaron()));
@@ -51,6 +58,13 @@ public class RobotContainer {
 
   private void configureBindings() {
     m_driverProfile.configureBindings(m_robotDrive);
+
+    // NOTE: Test function for sim
+    Objects.DRIVER_CONTROLLER.a().whileTrue(new InstantCommand(() -> {
+      m_robotArm.setSpeeds(6.0);
+    })).whileFalse(new InstantCommand(() -> {
+      m_robotArm.setSpeeds(0.0);
+    }));
   }
 
   /**
@@ -73,6 +87,8 @@ public class RobotContainer {
     return new InstantCommand(() -> {
       m_driverProfile = profile;
       configureBindings();
+
+      System.out.println("your mother");
     });
   }
 
@@ -80,3 +96,17 @@ public class RobotContainer {
     return new PrintCommand("No autonomous configured");
   }
 }
+
+// return new FunctionalCommand(
+// /* Init Code */
+// () -> {},
+// /* Execute Code */
+// () -> {},
+// /* End code */
+// interrupted -> {},
+// /* Is finished */
+// () -> false,
+// /* Required subsystems */
+// this
+// );
+// }

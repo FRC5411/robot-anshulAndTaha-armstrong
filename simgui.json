@@ -3,6 +3,7 @@
     "types": {
       "/FMSInfo": "FMSInfo",
       "/Shuffleboard/Driver Profiles/SendableChooser[0]": "String Chooser",
+      "/Shuffleboard/Driver/SendableChooser[0]": "String Chooser",
       "/SmartDashboard/Field": "Field2d"
     }
   },

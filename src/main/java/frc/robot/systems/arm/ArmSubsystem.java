@@ -4,148 +4,156 @@
 
 package frc.robot.systems.arm;
 
-import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.systems.arm.ArmVars.Constants;
+import frc.robot.systems.arm.ArmVars.Objects;
+import frc.robot.systems.arm.ArmVars.Simulation;
+import frc.robot.systems.arm.ArmVars.Vars;
+import frc.robot.systems.arm.ArmVars.Constants.ConeSetpoints;
+import frc.robot.systems.arm.ArmVars.Constants.CubeSetpoints;
+import frc.robot.utils.Alert;
+import frc.robot.utils.Alert.AlertType;
 
+// TODO: Add soft limits for the arm
+
+/** ArmSubsystem subsytem class */
 public class ArmSubsystem extends SubsystemBase {
-  private ArmIO armIO;
 
-  public ArmSubsystem() {
-    armIO = new ArmIO();
-  }
+    private final ArmIO m_armIO;
 
-  //////////////////////////////////////////////////////////////////////////////////////////////////
+    private final ArmIOInputsAutoLogged m_armInputs = new ArmIOInputsAutoLogged();
 
-  public void setArmTeleop(double speed){
-    armIO.setArmReduc(speed);
-  }
-
-  //////////////////////////////////////////////////////////////////////////////////////////////////
-
-  // NOTE: This function uses isACone as a paramater and not a global variable because we don't want it to affect buttonboard
-  public FunctionalCommand armPIDAuton(ArmSubsystem robotArm, String strSetpoint, boolean isACone){
-    double kP = 0.066;
-    double kI = 0;
-    double kD = 0;
-
-    ProfiledPIDController pid = new ProfiledPIDController(kP, kI, kD, new TrapezoidProfile.Constraints(Constants.kArmVelocity, Constants.kArmAcceleration));
-    
-    return new FunctionalCommand(() -> {
-
-      // Initialize Code
-        pid.setTolerance(2);
-        pid.reset(ArmIO.getArmAngle());
-
-        System.out.println("Command AUTON ARM ALIGN has started");
-      }, () -> {
-
-      // Execute Code
-        double calc = pid.calculate(ArmIO.getArmAngle(), returnAngle(strSetpoint, isACone));
-        armIO.setArm(calc);
-      }, 
-
-      interrupted -> {}, 
-
-      () -> false, 
-      
-      robotArm);
-  }
-
-  //////////////////////////////////////////////////////////////////////////////////////////////////
-
-  public FunctionalCommand armFFHold(ArmSubsystem robotArm) {
-    double kg = 0.03;
-
-    ArmFeedforward feedForward = new ArmFeedforward(0, kg, 0, 0);
-    
-    return new FunctionalCommand(
-      // Init
-      () -> System.out.println("Command HOLD ARM COMMAND has started"),
-      // Exec
-      () -> {
-        if(true /* RobotStates.ShouldHoldArm */){
-          double calc = feedForward.calculate(ArmIO.getXAxisArmAngle(), 0);
-    
-          armIO.setArm(calc);
-
-          System.out.println("\nAS : EXECUTING armFFHold" + "\nAS : ARM CALC " + calc + "\nAS : ARM ANGLE " + ArmIO.getArmAngle());
-        }}, 
-      interrupted -> {},
-      () -> false, 
-      robotArm);
-  }
-
-  //////////////////////////////////////////////////////////////////////////////////////////////////
-
-  public FunctionalCommand armPIDTeleop(ArmSubsystem robotArm, String strSetpoint){
-    double kP = 0.066;
-    double kI = 0;
-    double kD = 0;
-
-    ProfiledPIDController pid = new ProfiledPIDController(kP, kI, kD, new TrapezoidProfile.Constraints(Constants.kArmVelocity, Constants.kArmAcceleration));
-    
-    return new FunctionalCommand(() -> {
-
-      // Init
-        pid.setTolerance(2);
-        pid.reset(ArmIO.getArmAngle());
-
-        System.out.println("Command TELEOP ARM ALIGN has started");
-      }, () -> {
-
-      // Exec
-        double calc = pid.calculate(ArmIO.getArmAngle(), returnAngle(strSetpoint, true /* RobotStates.isConeMode */));
-        
-        armIO.setArm(calc);
-
-        // System.out.println("\n\nAS : EXECUTING armPIDTeleop" + "\nAS : ARM CALC " + calc + "\nAS : ARM ANGLE " + ArmIO.getArmAngle() + "\nAS : RETURNED ANGLE " + returnAngle(strSetpoint, RobotStates.sIsConeMode));
-      }, 
-
-      interrupted -> {}, 
-
-      () -> false, 
-      
-      robotArm);
-  }
-
-  //////////////////////////////////////////////////////////////////////////////////////////////////
-
-  private double returnAngle(String pos, boolean coneState){
-    switch(pos){
-      case "high":
-        return (coneState) ? Constants.ConeAngles.kHigh : Constants.CubeAngles.kHigh;
-
-      case "mid":
-        return (coneState) ? Constants.ConeAngles.kMid : Constants.CubeAngles.kMid;
-        
-      case "low":
-        return (coneState) ? Constants.ConeAngles.kLow : Constants.CubeAngles.kLow;
-        
-      case "ground":
-        return (coneState) ? Constants.ConeAngles.kGround : Constants.CubeAngles.kGround;
-        
-      case "substation":
-        return (coneState) ? Constants.ConeAngles.kSubstation : Constants.CubeAngles.kSubstation;
-
-      case "idle":
-        return Constants.kIdleAngle;
-        
-      default:
-        System.out.println("CODE ERROR! INVALID POSITION! CHECK ARMSUBSYSTEM!");
-        return 0;
+    /**
+     * Creates a new instance of the arm subsystem.
+     * 
+     * @param armIO Type of IO the subsystem will be using
+     */
+    public ArmSubsystem(ArmIO armIO) {
+        m_armIO = armIO;
     }
-  }
 
+    @Override
+    public void periodic() {
+        /* Update arm inputs */
+        m_armIO.updateInputs(m_armInputs);
+        Logger.getInstance().processInputs("/systems/arm/armIO", m_armInputs);
+    }
 
-  @Override
-  public void periodic() {
-    SmartDashboard.putNumber("ARM POITION : ", ArmIO.getArmAngle());
+    @Override
+    public void simulationPeriodic() {
+        /* Update simulated inputs */
+        m_armIO.updateInputs(m_armInputs);
+        Logger.getInstance().processInputs("/systems/arm/armIO", m_armInputs);
 
+        /* Update simulator */
+        Simulation.SIM_ARM.update(0.02);
 
-  }
+        /* Update encoder */
+        Simulation.SIM_ARM_ENCODER.setDistance(Math.toDegrees(Simulation.SIM_ARM.getAngleRads()));
+
+        /* Update visualiser */
+        Simulation.SIM_ARM_VISUAL_MECH2D.setAngle(Math.toDegrees(Simulation.SIM_ARM.getAngleRads()));
+
+        /* Update time */
+        Simulation.SIM_LAST_TIME += 0.02;
+    }
+
+    /**
+     * Sets the voltage of the arm
+     * 
+     * @param volts Volts
+     */
+    public void setSpeeds(double volts) {
+        m_armIO.setVolts(volts);
+    }
+
+    /**
+     * Moves or holds the arm based on setpoints
+     * 
+     * @param setpoint  Setpoint to move the arm to (Will not do anything if
+     *                  isHolding is true)
+     * @param isHolding If the arm should hold it's last position
+     * @return Command to manipulate the arm based on the params
+     */
+    public FunctionalCommand MoveArmCommand(String setpoint, boolean isHolding) {
+        /* Convert String goal to setpoint based on gamemode */
+        double goal = getSetpoint(setpoint);
+
+        /* Set controller tolerance (degs) */
+        Objects.ARM_CONTROLLER.setTolerance(Constants.CONTROLLER_TOLERANCE);
+
+        return new FunctionalCommand(
+                /* Init Code */
+                () -> {
+                },
+                /* Execute Code */
+                () -> {
+                    /* Calc percent output vals */
+                    double feedforwardCalc = Objects.ARM_FEEDFORWARD.calculate(getFeedForwardAngle(), 0.0);
+                    double profileCalc = Objects.ARM_CONTROLLER.calculate(m_armInputs.armPosition, goal);
+
+                    /* Set volts based on percent output */
+                    if (isHolding) {
+                        setSpeeds(feedforwardCalc * 12.0);
+                    } else {
+                        setSpeeds(profileCalc * 12.0);
+                    }
+                },
+                /* End code */
+                interrupted -> {
+                    /* Set volts to 0 when command ends */
+                    setSpeeds(0.0);
+                },
+                /* Is finished */
+                () -> false,
+                /* Required subsystems */
+                this);
+    }
+
+    /**
+     * Gets the correct setpoint for the arm based on the gamepiece
+     * 
+     * @param desiredSetpoint What position the arm needs to go
+     * @return The correct setpoint
+     */
+    public double getSetpoint(String desiredSetpoint) {
+        /* Will switch setpoint based on gamepiece mode */
+        switch (desiredSetpoint) {
+            case "HIGH":
+                return (Vars.IS_CONE) ? ConeSetpoints.HIGH : CubeSetpoints.HIGH;
+            case "MID":
+                return (Vars.IS_CONE) ? ConeSetpoints.MID : CubeSetpoints.MID;
+            case "LOW":
+                return (Vars.IS_CONE) ? ConeSetpoints.LOW : CubeSetpoints.LOW;
+            case "SUB":
+                return (Vars.IS_CONE) ? ConeSetpoints.SUB : CubeSetpoints.SUB;
+            case "GRND":
+                return (Vars.IS_CONE) ? ConeSetpoints.GRND : CubeSetpoints.GRND;
+            default:
+                new Alert("Arm", "No setpoint selected", AlertType.ERROR);
+                return 0.0;
+        }
+    }
+
+    /**
+     * Arm feedforward required the arm to be at a different idle angle than the
+     * robot is usually in. This method corrects for that
+     * 
+     * @return Adjusted angle for calculating the arm feedforward
+     */
+    public double getFeedForwardAngle() {
+        /* Get the position */
+        double angleDegs = m_armInputs.armPosition - Constants.SETPOINTS_FLAT;
+
+        /* Scope adjustment */
+        if (angleDegs < 0.0) {
+            angleDegs += 360.0;
+        }
+
+        // NOTE: Must convert to rads for FF
+        return Math.toRadians(angleDegs);
+    }
 }

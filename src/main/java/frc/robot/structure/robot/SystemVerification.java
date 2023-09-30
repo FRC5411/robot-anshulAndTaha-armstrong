@@ -8,6 +8,8 @@ import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.Constants.RobotType;
+import frc.robot.systems.arm.ArmIOSpM;
+import frc.robot.systems.arm.ArmSubsystem;
 import frc.robot.systems.drive.DriveIO;
 import frc.robot.systems.drive.DriveIOSim;
 import frc.robot.systems.drive.DriveIOSpM;
@@ -47,6 +49,30 @@ public class SystemVerification {
         return new DriveSubsystem(new DriveIO() {
         }, new GyroIO() {
         });
+    }
+
+    /**
+     * Verifies which mode the robot is in, then checks to see if it is real
+     * or simulated. Then sets the subsystem accordingly
+     * 
+     * @return The correct ArmSubsystem for the robot
+     */
+    public ArmSubsystem verifyRobotArm() {
+        /* If robot is not a replay */
+        if (getMode() != Mode.REPLAY) {
+            switch (getRobot()) {
+                /* If robot is a real robot */
+                case ROBOT_2023S:
+                    return new ArmSubsystem(new ArmIOSpM());
+                /* If robot is simulating */
+                case ROBOT_SIMBOT:
+                    return new ArmSubsystem(new ArmIOSpM());
+                default:
+                    break;
+            }
+        }
+        /* If robot is in fact in replay mode */
+        return new ArmSubsystem(new ArmIOSpM());
     }
 
     /**
