@@ -4,93 +4,93 @@
 
 package frc.robot.systems.intake;
 
-import edu.wpi.first.math.filter.LinearFilter;
-import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.systems.intake.IntakeVars.Constants;
+import frc.robot.systems.intake.IntakeVars.Objects;
+import frc.robot.systems.intake.IntakeVars.Vars;
 
+/** Intake subsystem class */
 public class IntakeSubsystem extends SubsystemBase {
 
-  private IntakeIO intakeIO;
+    private final IntakeIO m_intakeIO;
 
-  private boolean safeToSpin;
+    private final IntakeIOInputsAutoLogged m_intakeInputs = new IntakeIOInputsAutoLogged();
 
-  public IntakeSubsystem() {
-    intakeIO = new IntakeIO();
-    safeToSpin = false;
-  }
+    /**
+     * Creates a new instance of the intake subsystem
+     * 
+     * @param intakeIO Type of IO the subsystem will be using
+     */
+    public IntakeSubsystem(IntakeIO intakeIO) {
+        m_intakeIO = intakeIO;
+    }
 
-  public void setIntakeSpin(double speed) {
-    if (safeToSpin) intakeIO.setIntake(speed);
-  }
+    @Override
+    public void periodic() {
+        /* Update inputs */
+        m_intakeIO.updateInputs(m_intakeInputs);
+        Logger.getInstance().processInputs("/systems/intake/intakeIO", m_intakeInputs);
 
-  public void intakeIn() {
-    if (true) intakeIO.setIntake(-Constants.kIntakeConeSpeed);
-    //else intakeIO.setIntake(Constants.kIntakeCubeSpeed);
-  }
+        /* Calculate intake motor output average (25 samples) */
+        double calc = Objects.INTAKE_LIN_FILTER.calculate(m_intakeInputs.intakeOutputCurrent);
 
-  public void intakeIn(boolean isCone) {
-    if (isCone) intakeIO.setIntake(-Constants.kIntakeConeSpeed);
-    //else intakeIO.setIntake(Constants.kIntakeCubeSpeed);
-  }
-
-  public void intakeOut() {
-    if (true) intakeIO.setIntake(Constants.kIntakeConeSpeed);
-    //else intakeIO.setIntake(-Constants.kIntakeCubeSpeed);
-  }
-
-  public void intakeOut(boolean isCone) {
-    if (isCone) intakeIO.setIntake(Constants.kIntakeConeSpeed);
-    else intakeIO.setIntake(-Constants.kIntakeCubeSpeed);
-  }
-
-  public void intakeOff() {
-    intakeIO.setIntake(0.0);
-  }
-
-  // TO-DO: This method still needs to be tested to ensure it works the same as on the old code
-  public void safeSpinIntake() {
-    LinearFilter filter = LinearFilter.movingAverage(25);
-    double calc = filter.calculate(intakeIO.getIntakeCurrent());
-
-    if (calc > Constants.kIntakeCurrentLimit) { safeToSpin = false; }
-    else safeToSpin = true;
-  }
-
-  public FunctionalCommand intakeCommand(boolean isIntaking, boolean isCone) {
-    return new FunctionalCommand(() -> {
-      // Init
-    }, 
-
-    () -> {
-      // Exec
-      if (isCone) {
-        if (isIntaking) {
-          intakeIn(true);
+        /* Check if the average output current is more than our current limits */
+        if (calc > Constants.INTAKE_CURRENT_LIMIT) {
+            /* If so, stop the motor */
+            setSpeeds(0.0);
         }
-        else {
-          intakeOut(true);
+    }
+
+    /**
+     * Sets the volts of the motor (-12 to 12)
+     * 
+     * @param volts Volts
+     */
+    public void setSpeeds(double volts) {
+        m_intakeIO.setVolts(volts);
+    }
+
+    /**
+     * Intakes a gamepiece
+     * 
+     * @param isCone If the gamepiece is a cone or cube (not required)
+     */
+    public void intake(Boolean isCone) {
+        if (isCone.equals(null)) {
+            if (Vars.IS_CONE) {
+                setSpeeds(-(Constants.PERCENT_CONE_SPEED * 12.0));
+            } else {
+                setSpeeds((Constants.PERCENT_CUBE_SPEED * 12.0));
+            }
+        } else {
+            if (isCone) {
+                setSpeeds(-(Constants.PERCENT_CONE_SPEED * 12.0));
+            } else {
+                setSpeeds((Constants.PERCENT_CUBE_SPEED * 12.0));
+            }
         }
-      }
-      else {
-        if (isIntaking) {
-          intakeIn(false);
+    }
+
+    /**
+     * Outtakes a gamepiece
+     * 
+     * @param isCone If the gamepiece is a cone or cube (not required)
+     */
+    public void outtake(Boolean isCone) {
+        if (isCone.equals(null)) {
+            if (Vars.IS_CONE) {
+                setSpeeds((Constants.PERCENT_CONE_SPEED * 12.0));
+            } else {
+                setSpeeds(-(Constants.PERCENT_CUBE_SPEED * 12.0));
+            }
+        } else {
+            if (isCone) {
+                setSpeeds((Constants.PERCENT_CONE_SPEED * 12.0));
+            } else {
+                setSpeeds(-(Constants.PERCENT_CUBE_SPEED * 12.0));
+            }
         }
-        else {
-          intakeOut(false);
-        }
-      }
-    }, 
-
-    interrupted -> {}, 
-
-    () -> false,
-
-    this);
-  }
-
-  @Override
-  public void periodic() {
-    safeSpinIntake();
-  }
+    }
 }

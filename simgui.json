@@ -1,14 +1,31 @@
 {
   "NTProvider": {
     "types": {
+      "/AdvantageKit/RealOutputs//systems/arm/simArmMech": "Mechanism2d",
       "/FMSInfo": "FMSInfo",
       "/Shuffleboard/Driver Profiles/SendableChooser[0]": "String Chooser",
       "/Shuffleboard/Driver/SendableChooser[0]": "String Chooser",
+      "/SmartDashboard/ArmMech": "Mechanism2d",
       "/SmartDashboard/Field": "Field2d"
     }
   },
   "NetworkTables": {
     "transitory": {
+      "AdvantageKit": {
+        "RealOutputs": {
+          "open": true,
+          "systems": {
+            "arm": {
+              "open": true,
+              "simArmMech": {
+                "open": true
+              }
+            },
+            "open": true
+          }
+        },
+        "open": true
+      },
       "SmartDashboard": {
         "Drive": {
           "Chassis": {

@@ -1,17 +1,26 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.systems.intake;
 
-import frc.robot.systems.intake.IntakeVars.Objects;
+import org.littletonrobotics.junction.AutoLog;
 
-/** Add your docs here. */
-public class IntakeIO {
-    public IntakeIO() {}
-
-    public void setIntake(double speed) {
-        Objects.intakeMotor.set(speed);
+/** Class to interface with the intake subsytem */
+public interface IntakeIO {
+    @AutoLog
+    public static class IntakeIOInputs {
+        public double intakePosition = 0.0;
+        public double intakeVelocity = 0.0;
+        public double intakeTemperatureC = 0.0;
+        public double intakeOutputCurrent = 0.0;
     }
 
-    public double getIntakeCurrent() {
-        return Objects.intakeMotor.getOutputCurrent();
+    /** Update the set of loggable inputs */
+    public default void updateInputs(IntakeIOInputs inputs) {
+    }
+
+    /** Sets the voltage of the intake motor */
+    public default void setVolts(double volts) {
     }
 }

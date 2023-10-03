@@ -23,6 +23,6 @@ public class ArmIOSim implements ArmIO {
 
     public void setVolts(double volts) {
         volts = MathUtil.clamp(volts, -12.0, 12.0);
-        Simulation.SIM_ARM.setInputVoltage(volts);
+        Simulation.SIM_ARM.setInput(volts);
     }
 }

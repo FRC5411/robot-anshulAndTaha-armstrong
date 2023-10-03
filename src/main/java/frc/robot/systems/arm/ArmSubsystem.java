@@ -6,6 +6,7 @@ package frc.robot.systems.arm;
 
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.systems.arm.ArmVars.Constants;
@@ -19,7 +20,7 @@ import frc.robot.utils.Alert.AlertType;
 
 // TODO: Add soft limits for the arm
 
-/** ArmSubsystem subsytem class */
+/** Arm subsytem class */
 public class ArmSubsystem extends SubsystemBase {
 
     private final ArmIO m_armIO;
@@ -56,6 +57,9 @@ public class ArmSubsystem extends SubsystemBase {
 
         /* Update visualiser */
         Simulation.SIM_ARM_VISUAL_MECH2D.setAngle(Math.toDegrees(Simulation.SIM_ARM.getAngleRads()));
+
+        Logger.getInstance().recordOutput("/systems/arm/simArmMech", Simulation.SIM_ARM_MECH2D);
+        SmartDashboard.putData("ArmMech", Simulation.SIM_ARM_MECH2D);
 
         /* Update time */
         Simulation.SIM_LAST_TIME += 0.02;

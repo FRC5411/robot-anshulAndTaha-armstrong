@@ -9,10 +9,12 @@ package frc.robot;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import frc.robot.systems.arm.ArmSubsystem;
 import frc.robot.systems.drive.DriveSubsystem;
+import frc.robot.systems.intake.IntakeSubsystem;
 import frc.robot.structure.operator.ButtonMap.Objects;
 import frc.robot.structure.operator.OperatorProfiles.Aaron;
 import frc.robot.structure.operator.OperatorProfiles.Profile;
@@ -25,6 +27,7 @@ public class RobotContainer {
 
   private static DriveSubsystem m_robotDrive = m_robotVerification.verifyRobotDrive();
   private static ArmSubsystem m_robotArm = m_robotVerification.verifyRobotArm();
+  private static IntakeSubsystem m_robotIntake = m_robotVerification.verifyRobotIntake();
 
   private static SendableChooser<Command> m_driverChooser = new SendableChooser<>();
 
@@ -49,6 +52,10 @@ public class RobotContainer {
         // NOTE: Setpoint does nothing since isHolding is true
         m_robotArm.MoveArmCommand("HOLD", true));
 
+    /* Set the default command for the intake subsystem to not run the motor */
+    m_robotIntake.setDefaultCommand(
+      Commands.runOnce(() -> m_robotIntake.setSpeeds(0.0), m_robotIntake));
+
     Shuffleboard.getTab("Driver").add(m_driverChooser);
     m_driverChooser.setDefaultOption("SystemDefaults", setProfile(new SystemDefault()));
     m_driverChooser.addOption("Aaron", setProfile(new Aaron()));
@@ -65,6 +72,10 @@ public class RobotContainer {
     })).whileFalse(new InstantCommand(() -> {
       m_robotArm.setSpeeds(0.0);
     }));
+
+    Objects.DRIVER_CONTROLLER.b().whileTrue(m_robotArm.MoveArmCommand("HIGH", false))
+        .whileFalse(new InstantCommand(() -> {
+        }));
   }
 
   /**

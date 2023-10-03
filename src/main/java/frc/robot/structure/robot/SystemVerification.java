@@ -8,6 +8,8 @@ import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.Constants.RobotType;
+import frc.robot.systems.arm.ArmIO;
+import frc.robot.systems.arm.ArmIOSim;
 import frc.robot.systems.arm.ArmIOSpM;
 import frc.robot.systems.arm.ArmSubsystem;
 import frc.robot.systems.drive.DriveIO;
@@ -16,6 +18,10 @@ import frc.robot.systems.drive.DriveIOSpM;
 import frc.robot.systems.drive.DriveSubsystem;
 import frc.robot.systems.drive.GyroIO;
 import frc.robot.systems.drive.NavXIO;
+import frc.robot.systems.intake.IntakeIO;
+import frc.robot.systems.intake.IntakeIOSim;
+import frc.robot.systems.intake.IntakeIOSpM;
+import frc.robot.systems.intake.IntakeSubsystem;
 
 /** Class to check which system the robot is running on */
 public class SystemVerification {
@@ -66,13 +72,37 @@ public class SystemVerification {
                     return new ArmSubsystem(new ArmIOSpM());
                 /* If robot is simulating */
                 case ROBOT_SIMBOT:
-                    return new ArmSubsystem(new ArmIOSpM());
+                    return new ArmSubsystem(new ArmIOSim());
                 default:
                     break;
             }
         }
         /* If robot is in fact in replay mode */
-        return new ArmSubsystem(new ArmIOSpM());
+        return new ArmSubsystem(new ArmIO(){});
+    }
+
+    /**
+     * Verifies which mode the robot is in, then checks to see if it is real
+     * or simulated. Then sets the subsystem accordingly
+     * 
+     * @return The correct IntakeSubsystem for the robot
+     */
+    public IntakeSubsystem verifyRobotIntake() {
+        /* If robot is not a replay */
+        if (getMode() != Mode.REPLAY) {
+            switch (getRobot()) {
+                /* If robot is a real robot */
+                case ROBOT_2023S:
+                    return new IntakeSubsystem(new IntakeIOSpM());
+                /* If robot is simulating */
+                case ROBOT_SIMBOT:
+                    return new IntakeSubsystem(new IntakeIOSim());
+                default:
+                    break;
+            }
+        }
+        /* If robot is in fact in replay mode */
+        return new IntakeSubsystem(new IntakeIO(){});
     }
 
     /**
