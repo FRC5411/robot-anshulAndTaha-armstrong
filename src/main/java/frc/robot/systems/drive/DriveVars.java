@@ -37,8 +37,8 @@ public class DriveVars {
         public static final int RIGHT_FRONT_ID = 13;
         public static final int RIGHT_BACK_ID = 14;
 
-        public static final boolean LEFT_INVERT = true;
-        public static final boolean RIGHT_INVERT = false;
+        public static final boolean LEFT_INVERT = false;
+        public static final boolean RIGHT_INVERT = true;
 
         /* Motor adjustments */
         public static final double SPEED_SCALER = 0.4;

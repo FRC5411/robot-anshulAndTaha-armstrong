@@ -39,8 +39,8 @@ public class ArmVars {
         public static final boolean ARM_INVERTED = false;
 
         /* Physical properties */
-        public static final double ARM_ACCEL_PROFILE = 100.0 / 2.0;
-        public static final double ARM_VEL_PROFILE = 250.0 / 2.0;
+        public static final double ARM_ACCEL_PROFILE = 100.0;//100.0 / 2.0;
+        public static final double ARM_VEL_PROFILE = 250.0; //250.0 / 2.0;
 
         public static final double ARM_GEAR_RATIO = 0.25 / 1.0;
 
@@ -48,27 +48,27 @@ public class ArmVars {
 
         /** Arm position setpoints for cone */
         public final static class ConeSetpoints {
-            public static final double HIGH = 0.0;
-            public static final double MID = 0.0;
-            public static final double LOW = 0.0;
-            public static final double SUB = 0.0;
-            public static final double GRND = 0.0;
+            public static final double HIGH = 172.0;
+            public static final double MID = 193.0;
+            public static final double LOW = 112.0;
+            public static final double SUB = 174.0;
+            public static final double GRND = 257.0;
         }
 
         /** Arm position setpoints for cube */
         public static final class CubeSetpoints {
-            public static final double HIGH = 0.0;
-            public static final double MID = 0.0;
-            public static final double LOW = 0.0;
-            public static final double SUB = 0.0;
-            public static final double GRND = 0.0;
+            public static final double HIGH = 173.0;
+            public static final double MID = 142.0;
+            public static final double LOW = 112.0;
+            public static final double SUB = 178.0;
+            public static final double GRND = 263.0;
         }
 
         public static final double SETPOINTS_IDLE = 0.0;
-        public static final double SETPOINTS_FLAT = 0.0;
+        public static final double SETPOINTS_FLAT = 33.43;
 
         /* Controller constants */
-        public static final double CONTROLLER_P = 0.066;
+        public static final double CONTROLLER_P = 50.0;//0.066;
         public static final double CONTROLLER_I = 0.0;
         public static final double CONTROLLER_D = 0.0;
 
@@ -121,8 +121,8 @@ public class ArmVars {
                 SIM_ARM_REDUCTION,
                 SingleJointedArmSim.estimateMOI(SIM_ARM_LENGTH, SIM_ARM_MASS),
                 SIM_ARM_LENGTH,
-                Units.degreesToRadians(0.0),
-                Units.degreesToRadians(0.0),
+                Units.degreesToRadians(-30.0),
+                Units.degreesToRadians(225),
                 true,
                 VecBuilder.fill(0.01));
 
@@ -131,9 +131,9 @@ public class ArmVars {
         /* Simulation visualiser */
         public static final Mechanism2d SIM_ARM_MECH2D = new Mechanism2d(60.0, 60.0);
         public static final MechanismRoot2d SIM_ARM_PIVOT = SIM_ARM_MECH2D.getRoot(
-                "ArmPivot", 30.0, 30.0);
+                "ArmPivot", 30.0, 21);
         public static final MechanismLigament2d SIM_ARM_TOWER = SIM_ARM_PIVOT.append(
-                new MechanismLigament2d("ArmTower", 30, -90));
+                new MechanismLigament2d("ArmTower", 21, -90));
 
         /* Complete visualiser */
         public static final MechanismLigament2d SIM_ARM_VISUAL_MECH2D = SIM_ARM_PIVOT.append(

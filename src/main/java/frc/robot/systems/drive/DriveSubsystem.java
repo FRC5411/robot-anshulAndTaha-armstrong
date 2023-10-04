@@ -84,8 +84,9 @@ public class DriveSubsystem extends SubsystemBase {
    * @param leftVolts  voltage for the left side
    * @param rightVolts voltage for the right side
    */
-  public void setSpeeds(final double leftVolts, final double rightVolts) {
-    m_driveIO.setVolts(leftVolts, rightVolts);
+  public void setSpeeds(double leftVolts, double rightVolts) {
+    m_driveIO.setVolts(leftVolts * 12.0, rightVolts * 12.0);
+    Objects.ROBOT_DRIVE.feed();
   }
 
   /**

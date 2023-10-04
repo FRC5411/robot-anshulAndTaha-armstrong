@@ -3,6 +3,10 @@
     "types": {
       "/AdvantageKit/RealOutputs//systems/arm/simArmMech": "Mechanism2d",
       "/FMSInfo": "FMSInfo",
+      "/LiveWindow/Ungrouped/DifferentialDrive[1]": "DifferentialDrive",
+      "/LiveWindow/Ungrouped/PIDController[1]": "PIDController",
+      "/LiveWindow/Ungrouped/Scheduler": "Scheduler",
+      "/LiveWindow/Ungrouped/navX-Sensor[4]": "Gyro",
       "/Shuffleboard/Driver Profiles/SendableChooser[0]": "String Chooser",
       "/Shuffleboard/Driver/SendableChooser[0]": "String Chooser",
       "/SmartDashboard/ArmMech": "Mechanism2d",
@@ -27,6 +31,12 @@
         "open": true
       },
       "SmartDashboard": {
+        "Arm": {
+          "open": true
+        },
+        "ArmMech": {
+          "open": true
+        },
         "Drive": {
           "Chassis": {
             "open": true
