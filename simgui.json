@@ -10,12 +10,16 @@
       "/Shuffleboard/Driver Profiles/SendableChooser[0]": "String Chooser",
       "/Shuffleboard/Driver/SendableChooser[0]": "String Chooser",
       "/SmartDashboard/ArmMech": "Mechanism2d",
+      "/SmartDashboard/DriverChooser": "String Chooser",
       "/SmartDashboard/Field": "Field2d"
     }
   },
   "NetworkTables": {
     "transitory": {
       "AdvantageKit": {
+        "DashboardInputs": {
+          "open": true
+        },
         "RealOutputs": {
           "open": true,
           "systems": {

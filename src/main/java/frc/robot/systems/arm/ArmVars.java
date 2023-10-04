@@ -38,6 +38,8 @@ public class ArmVars {
         public static final IdleMode ARM_IDLE_MODE = IdleMode.kBrake;
         public static final boolean ARM_INVERTED = false;
 
+        public static final double ARM_ENCODER_DISTANCE_PER_PULSE = 2.0 * Math.PI / 4096;
+
         /* Physical properties */
         public static final double ARM_ACCEL_PROFILE = 100.0;//100.0 / 2.0;
         public static final double ARM_VEL_PROFILE = 250.0; //250.0 / 2.0;
@@ -48,7 +50,7 @@ public class ArmVars {
 
         /** Arm position setpoints for cone */
         public final static class ConeSetpoints {
-            public static final double HIGH = 172.0;
+            public static final double HIGH = Units.degreesToRadians(172.0);// 172.0;
             public static final double MID = 193.0;
             public static final double LOW = 112.0;
             public static final double SUB = 174.0;
@@ -68,7 +70,7 @@ public class ArmVars {
         public static final double SETPOINTS_FLAT = 33.43;
 
         /* Controller constants */
-        public static final double CONTROLLER_P = 50.0;//0.066;
+        public static final double CONTROLLER_P = 1.0;//0.066;
         public static final double CONTROLLER_I = 0.0;
         public static final double CONTROLLER_D = 0.0;
 
@@ -94,7 +96,7 @@ public class ArmVars {
         public static final CANSparkMax ARM_MOTOR = Configurations.SparkMax(Constants.ARM_ID, MotorType.kBrushless,
                 Constants.ARM_INVERTED, Constants.ARM_CURRENT_LIMIT, Constants.ARM_IDLE_MODE, 1.0);
         public static final Encoder ARM_ENCODER = Configurations.Encoder(Constants.ENCODER_PORTS[0],
-                Constants.ENCODER_PORTS[1], 360.0 / 4096.0, false);
+                Constants.ENCODER_PORTS[1], Constants.ARM_ENCODER_DISTANCE_PER_PULSE, false);
 
         /* Arm controllers */
         public static final TrapezoidProfile.Constraints ARM_CONSTRAINTS = new TrapezoidProfile.Constraints(Constants.ARM_VEL_PROFILE, Constants.ARM_ACCEL_PROFILE);
@@ -124,7 +126,7 @@ public class ArmVars {
                 Units.degreesToRadians(-30.0),
                 Units.degreesToRadians(225),
                 true,
-                VecBuilder.fill(0.01));
+                VecBuilder.fill(Constants.ARM_ENCODER_DISTANCE_PER_PULSE));
 
         public static final EncoderSim SIM_ARM_ENCODER = new EncoderSim(Objects.ARM_ENCODER);
 

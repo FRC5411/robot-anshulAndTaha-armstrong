@@ -82,9 +82,16 @@ public class RobotContainer {
     //   m_robotArm.setSpeeds(0.0);
     // }));
 
-    // Objects.DRIVER_CONTROLLER.b().whileTrue(m_robotArm.MoveArmCommand("HIGH", false))
-    //     .whileFalse(new InstantCommand(() -> {
-    //     }));
+    Objects.DRIVER_CONTROLLER.b().whileTrue(m_robotArm.MoveArmCommand("HIGH", false))
+        .whileFalse(new InstantCommand(() -> {
+        }));
+
+    Objects.DRIVER_CONTROLLER.a().whileTrue(Commands.runOnce( () -> m_robotArm.setSpeeds(6.0), m_robotArm))
+        .whileFalse(Commands.runOnce( () -> m_robotArm.setSpeeds(0.0), m_robotArm));
+
+    Objects.DRIVER_CONTROLLER.x().whileTrue(Commands.runOnce( () -> m_robotArm.setSpeeds(-6.0), m_robotArm))
+        .whileFalse(Commands.runOnce( () -> m_robotArm.setSpeeds(0.0), m_robotArm));
+
     buttonArmToSetpoint(
       Objects.OPERATOR_CONTROLLER.button(Map.B_ARM_HIGH), "HIGH");
 

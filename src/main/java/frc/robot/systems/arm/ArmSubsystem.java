@@ -6,7 +6,8 @@ package frc.robot.systems.arm;
 
 import org.littletonrobotics.junction.Logger;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.systems.arm.ArmVars.Constants;
@@ -53,13 +54,14 @@ public class ArmSubsystem extends SubsystemBase {
         Simulation.SIM_ARM.update(0.02);
 
         /* Update encoder */
-        Simulation.SIM_ARM_ENCODER.setDistance(Math.toDegrees(Simulation.SIM_ARM.getAngleRads()));
+        // Simulation.SIM_ARM_ENCODER.setDistance(Math.toDegrees(Simulation.SIM_ARM.getAngleRads()));
+        Simulation.SIM_ARM_ENCODER.setDistance(Simulation.SIM_ARM.getAngleRads());
 
         /* Update visualiser */
-        Simulation.SIM_ARM_VISUAL_MECH2D.setAngle(Math.toDegrees(Simulation.SIM_ARM.getAngleRads()));
+        // Simulation.SIM_ARM_VISUAL_MECH2D.setAngle(Math.toDegrees(Simulation.SIM_ARM.getAngleRads()));
+        Simulation.SIM_ARM_VISUAL_MECH2D.setAngle(Units.radiansToDegrees(Simulation.SIM_ARM.getAngleRads()));
 
         Logger.getInstance().recordOutput("/systems/arm/simArmMech", Simulation.SIM_ARM_MECH2D);
-        SmartDashboard.putData("ArmMech", Simulation.SIM_ARM_MECH2D);
 
         /* Update time */
         Simulation.SIM_LAST_TIME += 0.02;
@@ -72,6 +74,7 @@ public class ArmSubsystem extends SubsystemBase {
      */
     public void setSpeeds(double volts) {
         m_armIO.setVolts(volts);
+        Logger.getInstance().recordOutput("/systems/arm/setSpeedsVolts", MathUtil.clamp(volts, -12.0, 12.0));
     }
 
     /**
@@ -98,6 +101,8 @@ public class ArmSubsystem extends SubsystemBase {
                     /* Calc percent output vals */
                     double feedforwardCalc = Objects.ARM_FEEDFORWARD.calculate(getFeedForwardAngle(), 0.0);
                     double profileCalc = Objects.ARM_CONTROLLER.calculate(m_armInputs.armPosition, goal);
+                    Logger.getInstance().recordOutput("/systems/arm/profileCalc", profileCalc);
+                    Logger.getInstance().recordOutput("/systems/arm/goal", goal);
 
                     /* Set volts based on percent output */
                     if (isHolding) {
