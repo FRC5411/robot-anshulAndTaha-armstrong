@@ -52,7 +52,7 @@ public class RobotContainer {
         // un-invert them
         m_robotDrive.ArcadeCommand(
             () -> -Objects.DRIVER_CONTROLLER.getLeftY(),
-            () -> -Objects.DRIVER_CONTROLLER.getRightX(),
+            () -> -Objects.DRIVER_CONTROLLER.getLeftX(),
             () -> Objects.DRIVER_CONTROLLER.leftTrigger().getAsBoolean(),
             true));
 

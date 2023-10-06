@@ -67,11 +67,18 @@ public class DriveSubsystem extends SubsystemBase {
 
   @Override
   public void simulationPeriodic() {
+    /* Update and process drive motor inputs */
+    m_driveIO.updateInputs(m_driveInputs);
+    Logger.getInstance().processInputs("/systems/drive/driveIO", m_driveInputs);
+
     /* Updates simulation's time */
     Simulation.lasttime += 0.02;
 
     /* Updates the simulation plant */
     Simulation.DRIVE_SIMULATOR.update(0.02);
+    
+    /* Updates the simulation gyro */
+    Simulation.GYRO_SIMULATOR.setAngle(m_gyroInputs.gyroYawDeg.getDegrees());
   }
 
   public void resetGyroYaw() {

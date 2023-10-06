@@ -8,6 +8,7 @@ import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.systems.arm.ArmVars.Constants;
@@ -62,6 +63,7 @@ public class ArmSubsystem extends SubsystemBase {
         Simulation.SIM_ARM_VISUAL_MECH2D.setAngle(Units.radiansToDegrees(Simulation.SIM_ARM.getAngleRads()));
 
         Logger.getInstance().recordOutput("/systems/arm/simArmMech", Simulation.SIM_ARM_MECH2D);
+        SmartDashboard.putData(Simulation.SIM_ARM_MECH2D);
 
         /* Update time */
         Simulation.SIM_LAST_TIME += 0.02;

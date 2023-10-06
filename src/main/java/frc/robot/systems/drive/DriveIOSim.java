@@ -18,22 +18,22 @@ public class DriveIOSim implements DriveIO {
         inputs.leftFrontPosition = Simulation.DRIVE_SIMULATOR.getLeftPositionMeters();
         inputs.leftBackPosition = Simulation.DRIVE_SIMULATOR.getLeftPositionMeters();
         inputs.rightFrontPosition = Simulation.DRIVE_SIMULATOR.getRightPositionMeters();
-        inputs.rightFrontPosition = Simulation.DRIVE_SIMULATOR.getRightPositionMeters();
+        inputs.rightBackPosition = Simulation.DRIVE_SIMULATOR.getRightPositionMeters();
 
         inputs.leftFrontVelocity = Simulation.DRIVE_SIMULATOR.getLeftVelocityMetersPerSecond();
         inputs.leftBackVelocity = Simulation.DRIVE_SIMULATOR.getLeftVelocityMetersPerSecond();
         inputs.rightFrontVelocity = Simulation.DRIVE_SIMULATOR.getRightVelocityMetersPerSecond();
-        inputs.rightFrontVelocity = Simulation.DRIVE_SIMULATOR.getRightVelocityMetersPerSecond();
+        inputs.rightBackVelocity = Simulation.DRIVE_SIMULATOR.getRightVelocityMetersPerSecond();
 
         inputs.leftFrontTemperatureC = 0.0;
         inputs.leftBackTemperatureC = 0.0;
         inputs.rightFrontTemperatureC = 0.0;
-        inputs.rightFrontTemperatureC = 0.0;
+        inputs.rightBackTemperatureC = 0.0;
 
         inputs.leftFrontAppliedCurrent = Simulation.DRIVE_SIMULATOR.getLeftCurrentDrawAmps();
         inputs.leftBackAppliedCurrent = Simulation.DRIVE_SIMULATOR.getLeftCurrentDrawAmps();
         inputs.rightFrontAppliedCurrent = Simulation.DRIVE_SIMULATOR.getRightCurrentDrawAmps();
-        inputs.rightFrontAppliedCurrent = Simulation.DRIVE_SIMULATOR.getRightCurrentDrawAmps();
+        inputs.rightBackAppliedCurrent = Simulation.DRIVE_SIMULATOR.getRightCurrentDrawAmps();
     }
 
     public void setVolts(double leftVolts, double rightVolts) {

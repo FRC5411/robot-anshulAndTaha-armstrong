@@ -17,6 +17,7 @@ import frc.robot.systems.drive.DriveIOSim;
 import frc.robot.systems.drive.DriveIOSpM;
 import frc.robot.systems.drive.DriveSubsystem;
 import frc.robot.systems.drive.GyroIO;
+import frc.robot.systems.drive.GyroIOSim;
 import frc.robot.systems.drive.NavXIO;
 import frc.robot.systems.intake.IntakeIO;
 import frc.robot.systems.intake.IntakeIOSim;
@@ -45,8 +46,7 @@ public class SystemVerification {
                     return new DriveSubsystem(new DriveIOSpM(), new NavXIO());
                 /* If robot is simulating */
                 case ROBOT_SIMBOT:
-                    return new DriveSubsystem(new DriveIOSim(), new GyroIO() {
-                    });
+                    return new DriveSubsystem(new DriveIOSim(), new GyroIOSim());
                 default:
                     break;
             }
