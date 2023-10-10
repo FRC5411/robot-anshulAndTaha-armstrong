@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.systems.arm.ArmSubsystem;
 import frc.robot.systems.arm.ArmVars;
+import frc.robot.systems.arm.ArmVars.Vars;
 import frc.robot.systems.drive.DriveSubsystem;
 import frc.robot.systems.intake.IntakeSubsystem;
 import frc.robot.systems.intake.IntakeVars;
@@ -124,10 +125,9 @@ public class RobotContainer {
 
     buttonToggleMode(Objects.OPERATOR_CONTROLLER.button(Map.B_TOGGLE_MODE));
 
-    // buttonSniperMode(Objects.OPERATOR_CONTROLLER.button(ControllerConstants.kSniper));
+    buttonSniperMode(Objects.OPERATOR_CONTROLLER.button(Map.B_ARM_SNIPER));
   }
 
-  /* ----------------------------------------------------------------------------- */
   /* Custom button board methods */
   private void buttonArmToSetpoint(Trigger button, String position) {
     button.whileTrue(
@@ -139,10 +139,11 @@ public class RobotContainer {
 
   private void buttonManualArm(Trigger button, double speed) {
     button.whileTrue(
-      Commands.runOnce( () -> m_robotArm.setSpeeds(speed), m_robotArm)
-    ).whileFalse(
-      new InstantCommand()
-    );
+        Commands.runOnce(
+            ((Vars.IS_SNIPER) ? () -> m_robotArm.setSpeeds(speed * 0.5) : () -> m_robotArm.setSpeeds(speed)),
+            m_robotArm))
+        .whileFalse(
+            new InstantCommand());
   }
 
   private void buttonRunIntake(Trigger button, boolean isIntaking) {
@@ -166,15 +167,13 @@ public class RobotContainer {
     );
   }
 
-  // private void buttonSniperMode(Trigger button) {
-  //   button.whileTrue(
-  //     Commands.runOnce( () -> DriveVars.Vars., m_robotDrive)
-  //   ).whileFalse(
-  //     Commands.runOnce( () -> m_robotDrive.setSniperCommand(false), m_robotDrive)
-  //   );
-  // }
-
-  /* ----------------------------------------------------------------------------- */
+  private void buttonSniperMode(Trigger button) {
+    button.whileTrue(
+      Commands.runOnce( () -> Vars.IS_SNIPER = true, m_robotArm)
+    ).whileFalse(
+      Commands.runOnce( () -> Vars.IS_SNIPER = false, m_robotArm)
+    );
+  }
 
   /**
    * Command to initialize profiles when teleop is enabled

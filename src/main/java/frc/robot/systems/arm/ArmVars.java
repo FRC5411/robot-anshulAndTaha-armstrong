@@ -86,6 +86,8 @@ public class ArmVars {
     public final static class Vars {
         // NOTE: True by default
         public static boolean IS_CONE = true;
+
+        public static boolean IS_SNIPER = false;
     }
 
     /**

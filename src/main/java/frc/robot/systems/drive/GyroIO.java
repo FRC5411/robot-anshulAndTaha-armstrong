@@ -8,6 +8,8 @@ import org.littletonrobotics.junction.AutoLog;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 
+// TODO: Change rot2d objects to doubles
+
 /** Class to interface with the drive's gyro */
 public interface GyroIO {
     @AutoLog

@@ -4,12 +4,21 @@
 
 package frc.robot.systems.drive;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import org.littletonrobotics.junction.Logger;
 
+import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.auto.PIDConstants;
+import com.pathplanner.lib.auto.RamseteAutoBuilder;
+
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -34,7 +43,7 @@ public class DriveSubsystem extends SubsystemBase {
    * Creates a new instance of the drive subsystem.
    * 
    * @param driveIO Type of IO the subsystem will be using
-   * @param gyroIO Type of IO the gyro will be using
+   * @param gyroIO  Type of IO the gyro will be using
    */
   public DriveSubsystem(DriveIO driveIO, GyroIO gyroIO) {
     m_driveIO = driveIO;
@@ -58,7 +67,8 @@ public class DriveSubsystem extends SubsystemBase {
     /* Update pose estimator (odometry) */
     Objects.ROBOT_POSE_ESTIMATOR.update(m_gyroInputs.gyroYawDeg, m_driveInputs.leftFrontPosition,
         m_driveInputs.rightFrontPosition);
-    Logger.getInstance().recordOutput("/systems/drive/estimatedPose", Objects.ROBOT_POSE_ESTIMATOR.getEstimatedPosition());
+    Logger.getInstance().recordOutput("/systems/drive/estimatedPose",
+        Objects.ROBOT_POSE_ESTIMATOR.getEstimatedPosition());
 
     /* Update Field2d pose */
     Objects.ROBOT_FIELD.setRobotPose(Objects.ROBOT_POSE_ESTIMATOR.getEstimatedPosition());
@@ -76,11 +86,12 @@ public class DriveSubsystem extends SubsystemBase {
 
     /* Updates the simulation plant */
     Simulation.DRIVE_SIMULATOR.update(0.02);
-    
+
     /* Updates the simulation gyro */
     Simulation.GYRO_SIMULATOR.setAngle(m_gyroInputs.gyroYawDeg.getDegrees());
   }
 
+  /** Resets the yaw of the gyro */
   public void resetGyroYaw() {
     Objects.NAVX.reset();
   }
@@ -175,6 +186,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return A new balance command
    */
   public Command BalanceCommand() {
+    // TODO: Adjust FF to be an arm FF
     final ProfiledPIDController kController = new ProfiledPIDController(0.0243, 0.0, 0.0,
         new TrapezoidProfile.Constraints(1.0, 0.5));
     final double kF = 0.05;
@@ -203,5 +215,42 @@ public class DriveSubsystem extends SubsystemBase {
         () -> false,
         /* Required subsystems */
         this);
+  }
+
+  /**
+   * Command that will follow a trajectory and it's plotted events
+   *
+   * @param trajectory  Trajectory to follow (filename)
+   * @param useAlliance Should change path based on your current alliance
+   * @param eventMap    Map of events
+   * @return Autonomous command that will follow a path and execute events
+   */
+  public Command followPathWithEventsCommand(String trajectory, boolean useAlliance,
+      HashMap<String, Command> eventMap) {
+    /* Init path vars */
+    PathConstraints pathConstraints = PathPlanner.getConstraintsFromPath(trajectory);
+    List<PathPlannerTrajectory> path = PathPlanner.loadPathGroup(trajectory, pathConstraints);
+    PathPlannerTrajectory mapPath = PathPlanner.loadPath(trajectory, pathConstraints);
+
+    /* Display the trajectory on the field obj */
+    Objects.ROBOT_FIELD.getObject(trajectory).setTrajectory(mapPath);
+
+    /* Reset encoder poses */
+    Objects.LEFT_FRONT_ENCODER.setPosition(0.0);
+    Objects.LEFT_BACK_ENCODER.setPosition(0.0);
+    Objects.RIGHT_FRONT_ENCODER.setPosition(0.0);
+    Objects.RIGHT_BACK_ENCODER.setPosition(0.0);
+
+    /* Build path with events */
+    // TODO: Fix reset pose consumer
+    RamseteAutoBuilder pathBuilder = new RamseteAutoBuilder(() -> Objects.ROBOT_POSE_ESTIMATOR.getEstimatedPosition(),
+        pose -> Objects.ROBOT_POSE_ESTIMATOR.resetPosition(m_gyroInputs.gyroYawDeg, m_driveInputs.leftFrontPosition,
+            m_driveInputs.rightFrontPosition, pose),
+        Objects.DRIVE_RAMSETE_CONTROLLER, Constants.DRIVE_KINEMATICS, Objects.DRIVE_FEEDFORWARD,
+        () -> new DifferentialDriveWheelSpeeds(m_driveInputs.leftFrontVelocity, m_driveInputs.rightFrontVelocity),
+        new PIDConstants(Constants.DRIVE_PP_P, Constants.DRIVE_PP_I, Constants.DRIVE_PP_D), this::setSpeeds, eventMap,
+        useAlliance, this);
+
+    return pathBuilder.fullAuto(path);
   }
 }
