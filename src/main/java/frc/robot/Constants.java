@@ -21,6 +21,7 @@ public class Constants {
   }
 
   public static enum RobotType {
-    ROBOT_2023S, ROBOT_SIMBOT
+    ROBOT_2023S,
+    ROBOT_SIMBOT
   }
 }

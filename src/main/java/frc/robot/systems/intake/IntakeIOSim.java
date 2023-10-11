@@ -9,21 +9,20 @@ import edu.wpi.first.math.MathUtil;
 /** Simulates the intake (Neo550) motor */
 public class IntakeIOSim implements IntakeIO {
 
-    // NOTE: This class does not do anything
+  // NOTE: This class does not do anything
 
-    /** Creates a new simulation for the intake */
-    public IntakeIOSim() {
-    }
+  /** Creates a new simulation for the intake */
+  public IntakeIOSim() {}
 
-    @Override
-    public void updateInputs(IntakeIOInputs inputs) {
-        inputs.intakePosition = 0.0;
-        inputs.intakeVelocity = 0.0;
-        inputs.intakeTemperatureC = 0.0;
-        inputs.intakeOutputCurrent = 0.0;
-    }
+  @Override
+  public void updateInputs(IntakeIOInputs inputs) {
+    inputs.intakePosition = 0.0;
+    inputs.intakeVelocity = 0.0;
+    inputs.intakeTemperatureC = 0.0;
+    inputs.intakeOutputCurrent = 0.0;
+  }
 
-    public void setVolts(double volts) {
-        volts = MathUtil.clamp(volts, -12.0, 12.0);
-    }
+  public void setVolts(double volts) {
+    volts = MathUtil.clamp(volts, -12.0, 12.0);
+  }
 }

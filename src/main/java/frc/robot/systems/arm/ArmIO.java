@@ -8,17 +8,17 @@ import org.littletonrobotics.junction.AutoLog;
 
 /** Class to interface with the drive subsytem */
 public interface ArmIO {
-    @AutoLog
-    public static class ArmIOInputs {
-        public double armPosition = 0.0;
-        public double armVelocity = 0.0;
-        public double armTemperatureC = 0.0;
-        public double armAppliedCurrent = 0.0;
-    }
+  @AutoLog
+  public static class ArmIOInputs {
+    public double armPosition = 0.0;
+    public double armVelocity = 0.0;
+    public double armTemperatureC = 0.0;
+    public double armAppliedCurrent = 0.0;
+  }
 
-    /** Update the set of loggable inputs */
-    public default void updateInputs(ArmIOInputs inputs) {}
+  /** Update the set of loggable inputs */
+  public default void updateInputs(ArmIOInputs inputs) {}
 
-    /** Sets the voltage of the arm motor */
-    public default void setVolts(double volts) {}
+  /** Sets the voltage of the arm motor */
+  public default void setVolts(double volts) {}
 }

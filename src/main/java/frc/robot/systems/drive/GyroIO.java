@@ -4,21 +4,19 @@
 
 package frc.robot.systems.drive;
 
-import org.littletonrobotics.junction.AutoLog;
-
 import edu.wpi.first.math.geometry.Rotation2d;
+import org.littletonrobotics.junction.AutoLog;
 
 // TODO: Change rot2d objects to doubles
 
 /** Class to interface with the drive's gyro */
 public interface GyroIO {
-    @AutoLog
-    public static class GyroIOInputs {
-        public Rotation2d gyroYawDeg = new Rotation2d();
-        public Rotation2d gyroPitchDeg = new Rotation2d();
-    }
+  @AutoLog
+  public static class GyroIOInputs {
+    public Rotation2d gyroYawDeg = new Rotation2d();
+    public Rotation2d gyroPitchDeg = new Rotation2d();
+  }
 
-    /** Update the Gyro's inputs */
-    public default void updateInputs(GyroIOInputs inputs) {
-    }
+  /** Update the Gyro's inputs */
+  public default void updateInputs(GyroIOInputs inputs) {}
 }

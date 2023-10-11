@@ -4,19 +4,11 @@
 
 package frc.robot.systems.drive;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.function.BooleanSupplier;
-import java.util.function.DoubleSupplier;
-
-import org.littletonrobotics.junction.Logger;
-
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.auto.PIDConstants;
 import com.pathplanner.lib.auto.RamseteAutoBuilder;
-
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -29,6 +21,11 @@ import frc.robot.systems.drive.DriveVars.Constants;
 import frc.robot.systems.drive.DriveVars.Objects;
 import frc.robot.systems.drive.DriveVars.Simulation;
 import frc.robot.systems.drive.DriveVars.Vars;
+import java.util.HashMap;
+import java.util.List;
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
+import org.littletonrobotics.junction.Logger;
 
 /** Drivetrain subsytem class */
 public class DriveSubsystem extends SubsystemBase {
@@ -41,9 +38,9 @@ public class DriveSubsystem extends SubsystemBase {
 
   /**
    * Creates a new instance of the drive subsystem.
-   * 
+   *
    * @param driveIO Type of IO the subsystem will be using
-   * @param gyroIO  Type of IO the gyro will be using
+   * @param gyroIO Type of IO the gyro will be using
    */
   public DriveSubsystem(DriveIO driveIO, GyroIO gyroIO) {
     m_driveIO = driveIO;
@@ -65,10 +62,11 @@ public class DriveSubsystem extends SubsystemBase {
     Logger.getInstance().processInputs("/systems/drive/gyroIO", m_gyroInputs);
 
     /* Update pose estimator (odometry) */
-    Objects.ROBOT_POSE_ESTIMATOR.update(m_gyroInputs.gyroYawDeg, m_driveInputs.leftFrontPosition,
-        m_driveInputs.rightFrontPosition);
-    Logger.getInstance().recordOutput("/systems/drive/estimatedPose",
-        Objects.ROBOT_POSE_ESTIMATOR.getEstimatedPosition());
+    Objects.ROBOT_POSE_ESTIMATOR.update(
+        m_gyroInputs.gyroYawDeg, m_driveInputs.leftFrontPosition, m_driveInputs.rightFrontPosition);
+    Logger.getInstance()
+        .recordOutput(
+            "/systems/drive/estimatedPose", Objects.ROBOT_POSE_ESTIMATOR.getEstimatedPosition());
 
     /* Update Field2d pose */
     Objects.ROBOT_FIELD.setRobotPose(Objects.ROBOT_POSE_ESTIMATOR.getEstimatedPosition());
@@ -98,8 +96,8 @@ public class DriveSubsystem extends SubsystemBase {
 
   /**
    * Sets the wheel speeds using voltage
-   * 
-   * @param leftVolts  voltage for the left side
+   *
+   * @param leftVolts voltage for the left side
    * @param rightVolts voltage for the right side
    */
   public void setSpeeds(double leftVolts, double rightVolts) {
@@ -109,34 +107,36 @@ public class DriveSubsystem extends SubsystemBase {
 
   /**
    * Simple arcade drive method to drive the robot
-   * 
-   * @param yInput       Forward speed of the robot (Typically left joystick Y)
-   * @param xInput       Rotational speed of the robot (Typically right joystick
-   *                     X)
+   *
+   * @param yInput Forward speed of the robot (Typically left joystick Y)
+   * @param xInput Rotational speed of the robot (Typically right joystick X)
    * @param squareInputs Should square inputs (true or false)
    */
   public void arcadeDrive(final double yInput, final double xInput, final boolean squareInputs) {
     var wheelSpeeds = DifferentialDrive.arcadeDriveIK(yInput, xInput, squareInputs);
 
-    setSpeeds(wheelSpeeds.left * DifferentialDrive.kDefaultMaxOutput,
+    setSpeeds(
+        wheelSpeeds.left * DifferentialDrive.kDefaultMaxOutput,
         wheelSpeeds.right * DifferentialDrive.kDefaultMaxOutput);
   }
 
   /**
    * An inline command for an Arcade Drive
-   * 
+   *
    * @param yInputSupplier Forward, backward speed
    * @param xInputSupplier Rotational speed
-   * @param sniperMode     Should make robot slower
-   * @param isTeleop       Make adjustments to inputs or not
+   * @param sniperMode Should make robot slower
+   * @param isTeleop Make adjustments to inputs or not
    * @return A new arcade command
    */
-  public Command ArcadeCommand(DoubleSupplier yInputSupplier, DoubleSupplier xInputSupplier, BooleanSupplier sniperMode,
+  public Command ArcadeCommand(
+      DoubleSupplier yInputSupplier,
+      DoubleSupplier xInputSupplier,
+      BooleanSupplier sniperMode,
       boolean isTeleop) {
     return new FunctionalCommand(
         /* Init Code */
-        () -> {
-        },
+        () -> {},
         /* Execute Code */
         () -> {
           /* Initialise all necessary vars */
@@ -172,8 +172,7 @@ public class DriveSubsystem extends SubsystemBase {
         },
         /* End Code */
         // NOTE: interrupted is a boolean
-        interrupted -> {
-        },
+        interrupted -> {},
         /* Is finished */
         () -> false,
         /* Required subsystems */
@@ -182,19 +181,18 @@ public class DriveSubsystem extends SubsystemBase {
 
   /**
    * An inline command to balance on the charge station
-   * 
+   *
    * @return A new balance command
    */
   public Command BalanceCommand() {
     // TODO: Adjust FF to be an arm FF
-    final ProfiledPIDController kController = new ProfiledPIDController(0.0243, 0.0, 0.0,
-        new TrapezoidProfile.Constraints(1.0, 0.5));
+    final ProfiledPIDController kController =
+        new ProfiledPIDController(0.0243, 0.0, 0.0, new TrapezoidProfile.Constraints(1.0, 0.5));
     final double kF = 0.05;
 
     return new FunctionalCommand(
         /* Init Code */
-        () -> {
-        },
+        () -> {},
         /* Execute Code */
         () -> {
           // NOTE: xInput and squareInputs should be left to 0.0 and false respectively
@@ -220,13 +218,13 @@ public class DriveSubsystem extends SubsystemBase {
   /**
    * Command that will follow a trajectory and it's plotted events
    *
-   * @param trajectory  Trajectory to follow (filename)
+   * @param trajectory Trajectory to follow (filename)
    * @param useAlliance Should change path based on your current alliance
-   * @param eventMap    Map of events
+   * @param eventMap Map of events
    * @return Autonomous command that will follow a path and execute events
    */
-  public Command followPathWithEventsCommand(String trajectory, boolean useAlliance,
-      HashMap<String, Command> eventMap) {
+  public Command followPathWithEventsCommand(
+      String trajectory, boolean useAlliance, HashMap<String, Command> eventMap) {
     /* Init path vars */
     PathConstraints pathConstraints = PathPlanner.getConstraintsFromPath(trajectory);
     List<PathPlannerTrajectory> path = PathPlanner.loadPathGroup(trajectory, pathConstraints);
@@ -243,13 +241,26 @@ public class DriveSubsystem extends SubsystemBase {
 
     /* Build path with events */
     // TODO: Fix reset pose consumer
-    RamseteAutoBuilder pathBuilder = new RamseteAutoBuilder(() -> Objects.ROBOT_POSE_ESTIMATOR.getEstimatedPosition(),
-        pose -> Objects.ROBOT_POSE_ESTIMATOR.resetPosition(m_gyroInputs.gyroYawDeg, m_driveInputs.leftFrontPosition,
-            m_driveInputs.rightFrontPosition, pose),
-        Objects.DRIVE_RAMSETE_CONTROLLER, Constants.DRIVE_KINEMATICS, Objects.DRIVE_FEEDFORWARD,
-        () -> new DifferentialDriveWheelSpeeds(m_driveInputs.leftFrontVelocity, m_driveInputs.rightFrontVelocity),
-        new PIDConstants(Constants.DRIVE_PP_P, Constants.DRIVE_PP_I, Constants.DRIVE_PP_D), this::setSpeeds, eventMap,
-        useAlliance, this);
+    RamseteAutoBuilder pathBuilder =
+        new RamseteAutoBuilder(
+            () -> Objects.ROBOT_POSE_ESTIMATOR.getEstimatedPosition(),
+            pose ->
+                Objects.ROBOT_POSE_ESTIMATOR.resetPosition(
+                    m_gyroInputs.gyroYawDeg,
+                    m_driveInputs.leftFrontPosition,
+                    m_driveInputs.rightFrontPosition,
+                    pose),
+            Objects.DRIVE_RAMSETE_CONTROLLER,
+            Constants.DRIVE_KINEMATICS,
+            Objects.DRIVE_FEEDFORWARD,
+            () ->
+                new DifferentialDriveWheelSpeeds(
+                    m_driveInputs.leftFrontVelocity, m_driveInputs.rightFrontVelocity),
+            new PIDConstants(Constants.DRIVE_PP_P, Constants.DRIVE_PP_I, Constants.DRIVE_PP_D),
+            this::setSpeeds,
+            eventMap,
+            useAlliance,
+            this);
 
     return pathBuilder.fullAuto(path);
   }

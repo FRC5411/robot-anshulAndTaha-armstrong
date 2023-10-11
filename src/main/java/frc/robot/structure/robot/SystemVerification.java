@@ -27,115 +27,112 @@ import frc.robot.systems.intake.IntakeSubsystem;
 /** Class to check which system the robot is running on */
 public class SystemVerification {
 
-    /** Creates a new System Verification object */
-    public SystemVerification() {
-    }
+  /** Creates a new System Verification object */
+  public SystemVerification() {}
 
-    /**
-     * Verifies which mode the robot is in, then checks to see if it is real
-     * or simulated. Then sets the subsystem accordingly
-     * 
-     * @return The correct DriveSubsystem for the robot
-     */
-    public DriveSubsystem verifyRobotDrive() {
-        /* If robot is not a replay */
-        if (getMode() != Mode.REPLAY) {
-            switch (getRobot()) {
-                /* If robot is a real robot */
-                case ROBOT_2023S:
-                    return new DriveSubsystem(new DriveIOSpM(), new NavXIO());
-                /* If robot is simulating */
-                case ROBOT_SIMBOT:
-                    return new DriveSubsystem(new DriveIOSim(), new GyroIOSim());
-                default:
-                    break;
-            }
-        }
-        /* If robot is in fact in replay mode */
-        return new DriveSubsystem(new DriveIO() {
-        }, new GyroIO() {
-        });
+  /**
+   * Verifies which mode the robot is in, then checks to see if it is real or simulated. Then sets
+   * the subsystem accordingly
+   *
+   * @return The correct DriveSubsystem for the robot
+   */
+  public DriveSubsystem verifyRobotDrive() {
+    /* If robot is not a replay */
+    if (getMode() != Mode.REPLAY) {
+      switch (getRobot()) {
+          /* If robot is a real robot */
+        case ROBOT_2023S:
+          return new DriveSubsystem(new DriveIOSpM(), new NavXIO());
+          /* If robot is simulating */
+        case ROBOT_SIMBOT:
+          return new DriveSubsystem(new DriveIOSim(), new GyroIOSim());
+        default:
+          break;
+      }
     }
+    /* If robot is in fact in replay mode */
+    return new DriveSubsystem(new DriveIO() {}, new GyroIO() {});
+  }
 
-    /**
-     * Verifies which mode the robot is in, then checks to see if it is real
-     * or simulated. Then sets the subsystem accordingly
-     * 
-     * @return The correct ArmSubsystem for the robot
-     */
-    public ArmSubsystem verifyRobotArm() {
-        /* If robot is not a replay */
-        if (getMode() != Mode.REPLAY) {
-            switch (getRobot()) {
-                /* If robot is a real robot */
-                case ROBOT_2023S:
-                    return new ArmSubsystem(new ArmIOSpM());
-                /* If robot is simulating */
-                case ROBOT_SIMBOT:
-                    return new ArmSubsystem(new ArmIOSim());
-                default:
-                    break;
-            }
-        }
-        /* If robot is in fact in replay mode */
-        return new ArmSubsystem(new ArmIO(){});
+  /**
+   * Verifies which mode the robot is in, then checks to see if it is real or simulated. Then sets
+   * the subsystem accordingly
+   *
+   * @return The correct ArmSubsystem for the robot
+   */
+  public ArmSubsystem verifyRobotArm() {
+    /* If robot is not a replay */
+    if (getMode() != Mode.REPLAY) {
+      switch (getRobot()) {
+          /* If robot is a real robot */
+        case ROBOT_2023S:
+          return new ArmSubsystem(new ArmIOSpM());
+          /* If robot is simulating */
+        case ROBOT_SIMBOT:
+          return new ArmSubsystem(new ArmIOSim());
+        default:
+          break;
+      }
     }
+    /* If robot is in fact in replay mode */
+    return new ArmSubsystem(new ArmIO() {});
+  }
 
-    /**
-     * Verifies which mode the robot is in, then checks to see if it is real
-     * or simulated. Then sets the subsystem accordingly
-     * 
-     * @return The correct IntakeSubsystem for the robot
-     */
-    public IntakeSubsystem verifyRobotIntake() {
-        /* If robot is not a replay */
-        if (getMode() != Mode.REPLAY) {
-            switch (getRobot()) {
-                /* If robot is a real robot */
-                case ROBOT_2023S:
-                    return new IntakeSubsystem(new IntakeIOSpM());
-                /* If robot is simulating */
-                case ROBOT_SIMBOT:
-                    return new IntakeSubsystem(new IntakeIOSim());
-                default:
-                    break;
-            }
-        }
-        /* If robot is in fact in replay mode */
-        return new IntakeSubsystem(new IntakeIO(){});
+  /**
+   * Verifies which mode the robot is in, then checks to see if it is real or simulated. Then sets
+   * the subsystem accordingly
+   *
+   * @return The correct IntakeSubsystem for the robot
+   */
+  public IntakeSubsystem verifyRobotIntake() {
+    /* If robot is not a replay */
+    if (getMode() != Mode.REPLAY) {
+      switch (getRobot()) {
+          /* If robot is a real robot */
+        case ROBOT_2023S:
+          return new IntakeSubsystem(new IntakeIOSpM());
+          /* If robot is simulating */
+        case ROBOT_SIMBOT:
+          return new IntakeSubsystem(new IntakeIOSim());
+        default:
+          break;
+      }
     }
+    /* If robot is in fact in replay mode */
+    return new IntakeSubsystem(new IntakeIO() {});
+  }
 
-    /**
-     * Gets if robot is real or is simulated
-     * 
-     * @return What robot it is
-     */
-    private static RobotType getRobot() {
-        if (RobotBase.isReal()) {
-            if (Constants.ROBOT == RobotType.ROBOT_SIMBOT) { // NOTE: Invalid robot selected
-                return RobotType.ROBOT_2023S;
-            } else {
-                return Constants.ROBOT;
-            }
-        }
+  /**
+   * Gets if robot is real or is simulated
+   *
+   * @return What robot it is
+   */
+  private static RobotType getRobot() {
+    if (RobotBase.isReal()) {
+      if (Constants.ROBOT == RobotType.ROBOT_SIMBOT) { // NOTE: Invalid robot selected
+        return RobotType.ROBOT_2023S;
+      } else {
         return Constants.ROBOT;
+      }
     }
+    return Constants.ROBOT;
+  }
 
-    /**
-     * Gets what mode the robot is currently in
-     * 
-     * @return Current robot mode
-     */
-    private static Mode getMode() {
-        switch (getRobot()) {
-            case ROBOT_2023S:
-                return RobotBase.isReal() ? Mode.REAL : Mode.REPLAY;
+  /**
+   * Gets what mode the robot is currently in
+   *
+   * @return Current robot mode
+   */
+  private static Mode getMode() {
+    switch (getRobot()) {
+      case ROBOT_2023S:
+        return RobotBase.isReal() ? Mode.REAL : Mode.REPLAY;
 
-            case ROBOT_SIMBOT:
-                return Mode.SIM;
+      case ROBOT_SIMBOT:
+        return Mode.SIM;
 
-            default:
-                return Mode.REAL;
-        }
+      default:
+        return Mode.REAL;
     }
+  }
 }

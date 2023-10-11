@@ -6,7 +6,7 @@ package frc.robot.utils;
 
 /** Add your docs here. */
 public class Conversions {
-    public static double boreEncTicksToDeg(double encDistance, double gearRatio){
-        return encDistance / gearRatio;
-    }
+  public static double boreEncTicksToDeg(double encDistance, double gearRatio) {
+    return encDistance / gearRatio;
+  }
 }

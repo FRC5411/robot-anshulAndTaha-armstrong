@@ -10,13 +10,12 @@ import frc.robot.systems.drive.DriveVars.Objects;
 /** Class to interface with a NavX */
 public class NavXIO implements GyroIO {
 
-    /** Creates a new interface for the NavX */
-    public NavXIO() {
-    }
+  /** Creates a new interface for the NavX */
+  public NavXIO() {}
 
-    @Override
-    public void updateInputs(GyroIOInputs inputs) {
-        inputs.gyroYawDeg = Rotation2d.fromDegrees(Objects.NAVX.getYaw());
-        inputs.gyroPitchDeg = Rotation2d.fromDegrees(Objects.NAVX.getPitch());
-    }
+  @Override
+  public void updateInputs(GyroIOInputs inputs) {
+    inputs.gyroYawDeg = Rotation2d.fromDegrees(Objects.NAVX.getYaw());
+    inputs.gyroPitchDeg = Rotation2d.fromDegrees(Objects.NAVX.getPitch());
+  }
 }

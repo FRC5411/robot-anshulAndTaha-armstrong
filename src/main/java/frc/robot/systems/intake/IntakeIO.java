@@ -8,19 +8,17 @@ import org.littletonrobotics.junction.AutoLog;
 
 /** Class to interface with the intake subsytem */
 public interface IntakeIO {
-    @AutoLog
-    public static class IntakeIOInputs {
-        public double intakePosition = 0.0;
-        public double intakeVelocity = 0.0;
-        public double intakeTemperatureC = 0.0;
-        public double intakeOutputCurrent = 0.0;
-    }
+  @AutoLog
+  public static class IntakeIOInputs {
+    public double intakePosition = 0.0;
+    public double intakeVelocity = 0.0;
+    public double intakeTemperatureC = 0.0;
+    public double intakeOutputCurrent = 0.0;
+  }
 
-    /** Update the set of loggable inputs */
-    public default void updateInputs(IntakeIOInputs inputs) {
-    }
+  /** Update the set of loggable inputs */
+  public default void updateInputs(IntakeIOInputs inputs) {}
 
-    /** Sets the voltage of the intake motor */
-    public default void setVolts(double volts) {
-    }
+  /** Sets the voltage of the intake motor */
+  public default void setVolts(double volts) {}
 }

@@ -8,15 +8,14 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.systems.drive.DriveVars.Simulation;
 
 /** Class to interface with a Gyro Sim */
-public class GyroIOSim implements GyroIO{
+public class GyroIOSim implements GyroIO {
 
-    /** Creates a new interface for the Sim */
-    public GyroIOSim() {
-    }
+  /** Creates a new interface for the Sim */
+  public GyroIOSim() {}
 
-    @Override
-    public void updateInputs(GyroIOInputs inputs) {
-        inputs.gyroYawDeg = Simulation.DRIVE_SIMULATOR.getHeading();
-        inputs.gyroPitchDeg = new Rotation2d();
-    }
+  @Override
+  public void updateInputs(GyroIOInputs inputs) {
+    inputs.gyroYawDeg = Simulation.DRIVE_SIMULATOR.getHeading();
+    inputs.gyroPitchDeg = new Rotation2d();
+  }
 }
